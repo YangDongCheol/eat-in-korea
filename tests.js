@@ -182,6 +182,52 @@ test("detectLang", () => {
   for (const e of ["en-US", "ko-KR", "", undefined, null]) eq(detectLang(e), "en");
 });
 
+// --- menus ---
+const nonEmpty = v => typeof v === "string" && v.trim() !== "";
+test("MENUS size", () => {
+  if (MENUS.length < 60 || MENUS.length > 80) throw new Error(`size ${MENUS.length}`);
+});
+test("MENUS valid", () => {
+  const tags = ["pork", "meat", "seafood", "nuts"];
+  for (const m of MENUS) {
+    const where = m && m.id;
+    if (!/^[a-z0-9-]+$/.test(m.id)) throw new Error(`bad id ${where}`);
+    for (const v of [m.ko, m.emoji, m.rom, m.name?.en, m.name?.zh, m.desc?.en, m.desc?.zh])
+      if (!nonEmpty(v)) throw new Error(`empty field in ${where}`);
+    if (!Number.isInteger(m.spice) || m.spice < 0 || m.spice > 3) throw new Error(`spice ${where}`);
+    if (!["hearty", "light"].includes(m.feel)) throw new Error(`feel ${where}`);
+    if (!Array.isArray(m.contains) || m.contains.some(c => !tags.includes(c)) || new Set(m.contains).size !== m.contains.length)
+      throw new Error(`contains ${where}`);
+    if (m.contains.includes("pork") && !m.contains.includes("meat")) throw new Error(`pork without meat ${where}`);
+  }
+  eq(new Set(MENUS.map(m => m.id)).size, MENUS.length);
+  eq(new Set(MENUS.map(m => m.ko)).size, MENUS.length);
+});
+test("MENUS zh has chinese", () => {
+  for (const m of MENUS) for (const v of [m.name.zh, m.desc.zh])
+    if (!/[一-鿿]/.test(v)) throw new Error(`${m.id} zh has no hanzi`);
+});
+test("MENUS no guarantee claims", () => {
+  const bad = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证"];
+  for (const m of MENUS) for (const v of [m.desc.en, m.desc.zh])
+    for (const w of bad) if (v.toLowerCase().includes(w)) throw new Error(`${m.id} contains "${w}"`);
+});
+const allowedCount = (restrictions, spice) => MENUS.filter(m => allowed(m, A(restrictions, spice, "any"))).length;
+test("single restriction leaves enough", () => {
+  for (const r of ["pork", "seafood", "nuts"]) if (allowedCount([r], "hot") < 20) throw new Error(`${r}: ${allowedCount([r], "hot")}`);
+  if (allowedCount(["vegetarian"], "hot") < 8) throw new Error(`vegetarian: ${allowedCount(["vegetarian"], "hot")}`);
+});
+test("all four restrictions still has menus", () => {
+  const n = allowedCount(["pork", "vegetarian", "seafood", "nuts"], "none");
+  if (n < 3) throw new Error(`only ${n}`);
+});
+test("every spice level has menus", () => {
+  for (const s of [0, 1, 2, 3]) {
+    const n = MENUS.filter(m => m.spice === s).length;
+    if (n < 5) throw new Error(`spice ${s}: ${n}`);
+  }
+});
+
 // --- report ---
 function report() {
   const failed = results.filter(r => !r.ok);
