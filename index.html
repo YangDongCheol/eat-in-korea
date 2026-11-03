@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eat in Korea</title>
+<meta name="theme-color" content="#fff6ec">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <div class="langs" id="langs">
+    <button type="button" data-lang="en" data-s="langEn"></button>
+    <button type="button" data-lang="zh" data-s="langZh"></button>
+  </div>
+
+  <section id="ask">
+    <h1 id="ask-title" tabindex="-1" data-s="title"></h1>
+    <p class="sub" data-s="subtitle"></p>
+    <div id="questions"></div>
+    <button id="go" class="primary" data-s="go"></button>
+    <button id="to-history" class="link" data-s="historyLink"></button>
+  </section>
+
+  <section id="result" hidden>
+    <div id="menu" class="menu">
+      <span class="tag" data-s="pickedTag"></span>
+      <div id="menu-emoji" class="emoji" aria-hidden="true"></div>
+      <h2 id="menu-name" tabindex="-1"></h2>
+      <p class="ko" id="menu-ko"></p>
+      <p class="spice" id="menu-spice"></p>
+      <p class="contains" data-s="contains"></p>
+      <ul class="tags" id="menu-tags"></ul>
+      <p class="desc" id="menu-desc"></p>
+    </div>
+    <div id="no-match" class="menu" hidden>
+      <div class="emoji" aria-hidden="true">🤔</div>
+      <h2 id="no-match-title" tabindex="-1" data-s="noMatch"></h2>
+      <p class="desc" data-s="noMatchHint"></p>
+    </div>
+    <p class="disclaimer" data-s="disclaimer"></p>
+    <button id="staff-btn" class="primary" data-s="showStaff"></button>
+    <button id="nearby" data-s="findNearby"></button>
+    <button id="another" data-s="another"></button>
+    <button id="back" class="link" data-s="back"></button>
+  </section>
+
+  <section id="staff" hidden lang="ko">
+    <h1 id="staff-dish" tabindex="-1"></h1>
+    <p class="order" id="staff-order"></p>
+    <ul id="staff-notes"></ul>
+    <button id="staff-back" class="link" data-s="staffBack"></button>
+  </section>
+
+  <section id="history" hidden>
+    <h1 id="history-title" tabindex="-1" data-s="historyTitle"></h1>
+    <ul id="history-list"></ul>
+    <p id="history-empty" data-s="noHistory"></p>
+    <button id="history-back" class="link" data-s="back"></button>
+  </section>
+</main>
+<script src="strings.js"></script>
+<script src="menus.js"></script>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
