@@ -155,7 +155,8 @@ test("sanitizeHistory caps at 100", () => {
 });
 
 // --- strings ---
-const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove"];
+const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原"];
+const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel"];
 test("strings keys match", () => {
   const en = Object.keys(STRINGS.en).sort();
   eq(en, Object.keys(STRINGS.zh).sort());
@@ -173,9 +174,8 @@ test("strings zh has chinese", () => {
     if (!["title", "langEn", "langZh"].includes(k) && !/[\u4e00-\u9fff]/.test(v)) throw new Error(`zh.${k} has no hanzi`);
 });
 test("strings no guarantee claims", () => {
-  const bad = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证"];
   for (const l of ["en", "zh"]) for (const [k, v] of Object.entries(STRINGS[l]))
-    for (const w of bad) if (v.toLowerCase().includes(w)) throw new Error(`${l}.${k} contains "${w}"`);
+    for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${l}.${k} contains "${w}"`);
 });
 test("detectLang", () => {
   for (const z of ["zh-CN", "zh-TW", "ZH"]) eq(detectLang(z), "zh");
@@ -208,9 +208,8 @@ test("MENUS zh has chinese", () => {
     if (!/[一-鿿]/.test(v)) throw new Error(`${m.id} zh has no hanzi`);
 });
 test("MENUS no guarantee claims", () => {
-  const bad = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证"];
-  for (const m of MENUS) for (const v of [m.desc.en, m.desc.zh])
-    for (const w of bad) if (v.toLowerCase().includes(w)) throw new Error(`${m.id} contains "${w}"`);
+  for (const m of MENUS) for (const v of [m.name.en, m.name.zh, m.desc.en, m.desc.zh])
+    for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${m.id} contains "${w}"`);
 });
 const allowedCount = (restrictions, spice) => MENUS.filter(m => allowed(m, A(restrictions, spice, "any"))).length;
 test("single restriction leaves enough", () => {

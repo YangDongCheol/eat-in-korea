@@ -10,10 +10,10 @@ const $ = (id) => document.getElementById(id);
 let store = null;
 try { store = window.localStorage; } catch {} // access itself can throw in private mode
 
-const savedLang = loadJSON(store, "lang", null);
+const savedLang = loadJSON(store, "eik:lang", null);
 let lang = savedLang === "en" || savedLang === "zh" ? savedLang : detectLang(navigator.language);
-const answers = sanitizeAnswers(loadJSON(store, "lastAnswers", null));
-let history = sanitizeHistory(loadJSON(store, "history", []), MENUS.map(m => m.id));
+const answers = sanitizeAnswers(loadJSON(store, "eik:lastAnswers", null));
+let history = sanitizeHistory(loadJSON(store, "eik:history", []), MENUS.map(m => m.id));
 let shown = [];
 let current = null;
 let recorded = false;
@@ -65,8 +65,8 @@ function renderResult() {
   $("menu-ko").textContent = `${m.ko} · ${m.rom}`;
   const sp = $("menu-spice");
   sp.textContent = "🌶️".repeat(m.spice);
-  sp.setAttribute("role", "img");
-  sp.setAttribute("aria-label", `${t.qSpice} ${m.spice}`);
+  if (m.spice) { sp.setAttribute("role", "img"); sp.setAttribute("aria-label", `${t.spiceLabel} ${m.spice}`); }
+  else { sp.removeAttribute("role"); sp.removeAttribute("aria-label"); }
   const tags = Object.keys(TAGS).filter(k => m.contains.includes(k)).map(k => t[TAGS[k]]);
   $("menu-tags").replaceChildren(...(tags.length ? tags : [t.tagNone]).map(x => {
     const li = document.createElement("li");
@@ -78,6 +78,7 @@ function renderResult() {
 
 function renderStaff() {
   const c = staffCard(current, answers.restrictions);
+  $("staff-back").lang = lang; // the section is lang="ko"; the toggle is hidden here
   $("staff-dish").textContent = c.dish;
   $("staff-order").textContent = c.order;
   $("staff-notes").replaceChildren(...c.notes.map(n => {
@@ -103,7 +104,7 @@ function renderHistory() {
     del.setAttribute("aria-label", t.remove);
     del.onclick = () => {
       history = history.filter((_, j) => j !== i);
-      saveJSON(store, "history", history);
+      saveJSON(store, "eik:history", history);
       renderHistory();
     };
     li.append(name, time, del);
@@ -144,12 +145,12 @@ function record() {
   if (recorded) return;
   recorded = true;
   history = addEntry(history, current.id, Date.now());
-  saveJSON(store, "history", history);
+  saveJSON(store, "eik:history", history);
   renderHistory();
 }
 
 $("go").onclick = () => {
-  saveJSON(store, "lastAnswers", answers);
+  saveJSON(store, "eik:lastAnswers", answers);
   shown = [];
   showPick();
 };
@@ -161,7 +162,7 @@ $("staff-back").onclick = () => show("result", "menu-name");
 $("to-history").onclick = () => { show("history", "history-title"); };
 $("history-back").onclick = () => show("ask", "ask-title");
 for (const b of document.querySelectorAll("[data-lang]")) {
-  b.onclick = () => { lang = b.dataset.lang; saveJSON(store, "lang", lang); renderAll(); };
+  b.onclick = () => { lang = b.dataset.lang; saveJSON(store, "eik:lang", lang); renderAll(); };
 }
 
 buildQuestions();
