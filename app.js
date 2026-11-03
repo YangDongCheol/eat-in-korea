@@ -1,5 +1,6 @@
 // UI: ask -> result -> staff card, plus history. Logic lives in logic.js, text in strings.js.
 const QUESTIONS = [
+  ["mode", "qMode", false, [["dine", "modeDine", "🍴"], ["delivery", "modeDelivery", "🛵"]]],
   ["restrictions", "qRestrict", true, [["pork", "optPork", "🐷"], ["vegetarian", "optVeg", "🥬"], ["seafood", "optSeafood", "🐟"], ["nuts", "optNuts", "🥜"]]],
   ["spice", "qSpice", false, [["none", "spiceNone", "🙂"], ["mild", "spiceMild", "🌶️"], ["hot", "spiceHot", "🔥"]]],
   ["feel", "qFeel", false, [["hearty", "feelHearty", "🍖"], ["light", "feelLight", "🥗"], ["any", "feelAny", "🎲"]]],
@@ -11,12 +12,13 @@ let store = null;
 try { store = window.localStorage; } catch {} // access itself can throw in private mode
 
 const savedLang = loadJSON(store, "eik:lang", null);
-let lang = savedLang === "en" || savedLang === "zh" ? savedLang : detectLang(navigator.language);
+let lang = ["en", "zh", "ko"].includes(savedLang) ? savedLang : detectLang(navigator.language);
 const answers = sanitizeAnswers(loadJSON(store, "eik:lastAnswers", null));
 let history = sanitizeHistory(loadJSON(store, "eik:history", []), MENUS.map(m => m.id));
 let shown = [];
 let current = null;
 let recorded = false;
+let hint = null; // delivery tip state: null | "copied" | "failed"; kept so a language switch can redraw it
 const chipLabels = []; // [button, stringKey, emoji] so a language switch can relabel without rebuilding
 
 function show(id, focusId) {
@@ -58,10 +60,16 @@ function renderResult() {
   const m = current;
   $("menu").hidden = !m;
   $("no-match").hidden = Boolean(m);
-  $("staff-btn").hidden = $("nearby").hidden = $("another").hidden = !m;
+  const delivery = answers.mode === "delivery";
+  $("another").hidden = !m;
+  $("staff-btn").hidden = !m || delivery || lang === "ko";
+  $("nearby").hidden = !m || delivery;
+  $("delivery-coupang").hidden = $("delivery-baemin").hidden = !m || !delivery;
+  renderHint();
   if (!m) return;
   $("menu-emoji").textContent = m.emoji;
-  $("menu-name").textContent = m.name[lang];
+  $("menu-name").textContent = menuName(m);
+  $("menu-ko").hidden = lang === "ko";
   $("menu-ko").textContent = `${m.ko} · ${m.rom}`;
   const sp = $("menu-spice");
   sp.textContent = "🌶️".repeat(m.spice);
@@ -74,6 +82,19 @@ function renderResult() {
     return li;
   }));
   $("menu-desc").textContent = m.desc[lang];
+}
+
+const menuName = (m) => lang === "ko" ? m.ko : m.name[lang];
+
+function renderHint() {
+  const el = $("delivery-hint");
+  if (!hint || !current || answers.mode !== "delivery") return el.replaceChildren();
+  const t = STRINGS[lang];
+  if (hint === "copied") return el.replaceChildren(t.deliveryHint.replace("{name}", current.ko));
+  const name = document.createElement("strong");
+  name.lang = "ko";
+  name.textContent = current.ko;
+  el.replaceChildren(t.deliveryCopyFailed, name);
 }
 
 function renderStaff() {
@@ -95,9 +116,9 @@ function renderHistory() {
     const li = document.createElement("li");
     const name = document.createElement("span");
     name.className = "name";
-    name.textContent = byId[e.id].name[lang];
+    name.textContent = menuName(byId[e.id]);
     const time = document.createElement("time");
-    time.textContent = new Date(e.at).toLocaleString(lang === "zh" ? "zh-CN" : "en-US", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
+    time.textContent = new Date(e.at).toLocaleString({ zh: "zh-CN", ko: "ko-KR" }[lang] || "en-US", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" });
     const del = document.createElement("button");
     del.type = "button";
     del.textContent = "✕";
@@ -132,6 +153,7 @@ function showPick() {
   const { menu, cycled } = pick(MENUS, answers, history, shown, Date.now());
   current = menu;
   recorded = false;
+  hint = null;
   if (menu) shown = cycled ? [menu.id] : [...shown, menu.id];
   renderResult();
   show("result", menu ? "menu-name" : "no-match-title");
@@ -155,9 +177,18 @@ $("go").onclick = () => {
   showPick();
 };
 $("another").onclick = showPick;
-$("back").onclick = () => show("ask", "ask-title");
+$("back").onclick = () => { hint = null; renderHint(); show("ask", "ask-title"); };
 $("staff-btn").onclick = () => { record(); renderStaff(); show("staff", "staff-dish"); };
 $("nearby").onclick = () => { record(); window.open(mapsUrl(current), "_blank", "noopener"); };
+function navigate(url) { window.location.assign(url); } // global so manual checks can override it
+for (const [id, app] of [["delivery-coupang", DELIVERY_APPS[0]], ["delivery-baemin", DELIVERY_APPS[1]]]) {
+  $(id).onclick = async () => {
+    record();
+    try { await navigator.clipboard.writeText(current.ko); hint = "copied"; } catch { hint = "failed"; }
+    renderHint();
+    navigate(deliveryUrl(app, navigator.userAgent));
+  };
+}
 $("staff-back").onclick = () => show("result", "menu-name");
 $("to-history").onclick = () => { show("history", "history-title"); };
 $("history-back").onclick = () => show("ask", "ask-title");

@@ -25,9 +25,10 @@ test("sw cache name versioned", () => {
 });
 test("sw activate only deletes this app's old caches", () => {
   const listeners = {}, deleted = [];
+  const cur = swSrc().match(/const CACHE = "(eik-v\d+)"/)[1];
   const ctx = {
     self: { addEventListener: (t, fn) => (listeners[t] = fn), clients: { claim: async () => {} } },
-    caches: { keys: async () => ["wte-v3", "eik-v0", "eik-v2"], delete: async (k) => deleted.push(k) },
+    caches: { keys: async () => ["wte-v3", "eik-v0", cur], delete: async (k) => deleted.push(k) },
   };
   vm.runInNewContext(swSrc(), ctx);
   let done;
