@@ -82,6 +82,78 @@ test("no match → null", () => {
   eq(pick(M, A(["vegetarian", "nuts"], "none", "hearty"), [], [], T), { menu: null, cycled: false });
 });
 
+// --- staff card, links, storage, sanitizers ---
+const EXPECTED_NOTES = {
+  pork: "저는 돼지고기를 먹을 수 없어요. 돼지고기나 돼지고기 육수가 들어가나요?",
+  vegetarian: "저는 채식을 해요. 고기, 생선, 고기 육수, 젓갈이 들어가나요?",
+  seafood: "저는 해산물을 먹을 수 없어요. 생선, 새우, 조개, 젓갈이 들어가나요?",
+  nuts: "저는 견과류와 땅콩을 먹을 수 없어요. 들어가나요?",
+};
+test("staffCard no restrictions", () => {
+  eq(staffCard(M[0], []), { dish: "김치찌개", order: "이거 1인분 주세요.", notes: [] });
+});
+for (const r of Object.keys(EXPECTED_NOTES)) {
+  test(`staffCard each sentence: ${r}`, () => eq(staffCard(M[0], [r]).notes, [EXPECTED_NOTES[r]]));
+}
+test("staffCard order", () => {
+  eq(staffCard(M[0], ["nuts", "pork", "seafood", "vegetarian"]).notes,
+    [EXPECTED_NOTES.pork, EXPECTED_NOTES.vegetarian, EXPECTED_NOTES.seafood, EXPECTED_NOTES.nuts]);
+});
+test("mapsUrl encodes", () => {
+  eq(mapsUrl({ ko: "떡볶이 & 튀김" }),
+    "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("떡볶이 & 튀김 식당"));
+});
+
+const fake = (o = {}) => ({ getItem: k => (k in o ? o[k] : null), setItem: (k, v) => { o[k] = v; } });
+const broken = { getItem() { throw new Error("denied"); }, setItem() { throw new Error("denied"); } };
+test("loadJSON missing", () => eq(loadJSON(fake(), "history", []), []));
+test("loadJSON broken", () => eq(loadJSON(fake({ history: "{oops" }), "history", []), []));
+test("storage throws", () => {
+  eq(loadJSON(broken, "history", []), []);
+  saveJSON(broken, "history", [1]);
+});
+test("round trip", () => {
+  const s = fake();
+  saveJSON(s, "answers", A(["pork"], "hot", "light"));
+  eq(loadJSON(s, "answers", null), A(["pork"], "hot", "light"));
+});
+
+test("addEntry caps at 100", () => {
+  const h = Array.from({ length: 100 }, (_, i) => ({ id: "m" + i, at: 100 - i }));
+  const out = addEntry(h, "new", 999);
+  eq(out.length, 100);
+  eq(out[0], { id: "new", at: 999 });
+  eq(out.some(e => e.id === "m99"), false);
+  eq(h.length, 100);
+  eq(h[0].id, "m0");
+});
+
+test("sanitizeAnswers null/string/number", () => {
+  for (const raw of [null, "x", 42]) eq(sanitizeAnswers(raw), DEFAULT_ANSWERS);
+});
+test("sanitizeAnswers unknown values", () => {
+  eq(sanitizeAnswers({ restrictions: ["pork", "moon", "pork"], spice: "lava", feel: "x" }), A(["pork"], "none", "any"));
+});
+test("sanitizeAnswers keeps valid", () => {
+  eq(sanitizeAnswers(A(["nuts"], "hot", "light")), A(["nuts"], "hot", "light"));
+});
+test("sanitizeAnswers returns new object", () => {
+  const out = sanitizeAnswers(null);
+  eq(out !== DEFAULT_ANSWERS && out.restrictions !== DEFAULT_ANSWERS.restrictions, true);
+});
+
+const ID = ["a", "b"];
+test("sanitizeHistory non-array", () => {
+  for (const raw of [{}, null, "x"]) eq(sanitizeHistory(raw, ID), []);
+});
+test("sanitizeHistory filters", () => {
+  eq(sanitizeHistory([{ id: "zzz", at: 1 }, { id: "a", at: NaN }, { id: "a", at: "5" }, null, { id: "b", at: 7 }], ID), [{ id: "b", at: 7 }]);
+});
+test("sanitizeHistory caps at 100", () => {
+  const raw = Array.from({ length: 150 }, (_, i) => ({ id: "a", at: i }));
+  eq(sanitizeHistory(raw, ID).length, 100);
+});
+
 // --- report ---
 function report() {
   const failed = results.filter(r => !r.ok);
