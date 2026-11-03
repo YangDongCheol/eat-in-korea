@@ -217,6 +217,11 @@ test("single restriction leaves enough", () => {
   for (const r of ["pork", "seafood", "nuts"]) if (allowedCount([r], "hot") < 20) throw new Error(`${r}: ${allowedCount([r], "hot")}`);
   if (allowedCount(["vegetarian"], "hot") < 8) throw new Error(`vegetarian: ${allowedCount(["vegetarian"], "hot")}`);
 });
+test("MENUS desc mentioning nuts is tagged nuts", () => {
+  const nutWords = /\b(nuts?|peanuts?|walnuts?|almonds?|chestnuts?)\b|坚果|花生|核桃|松子|杏仁|栗/i;
+  for (const m of MENUS) if (nutWords.test(m.desc.en + " " + m.desc.zh) && !m.contains.includes("nuts"))
+    throw new Error(`${m.id} mentions nuts but has no nuts tag`);
+});
 test("vegetarian hearty has menus", () => {
   const n = MENUS.filter(m => allowed(m, A(["vegetarian"], "hot", "hearty"))).length;
   if (n < 2) throw new Error(`only ${n}`);
