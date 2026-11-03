@@ -30,7 +30,7 @@ function pick(menus, answers, history, shown, now, rand = Math.random) {
   return { menu: oldest, cycled };
 }
 
-const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any" };
+const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any", mode: "dine" };
 const RESTRICTIONS = ["pork", "vegetarian", "seafood", "nuts"]; // also the notes order
 const NOTES = {
   pork: "저는 돼지고기를 먹을 수 없어요. 돼지고기나 돼지고기 육수가 들어가나요?",
@@ -70,6 +70,7 @@ function sanitizeAnswers(raw) {
     restrictions: RESTRICTIONS.filter(x => Array.isArray(r.restrictions) && r.restrictions.includes(x)),
     spice: ["none", "mild", "hot"].includes(r.spice) ? r.spice : DEFAULT_ANSWERS.spice,
     feel: ["hearty", "light", "any"].includes(r.feel) ? r.feel : DEFAULT_ANSWERS.feel,
+    mode: r.mode === "delivery" ? "delivery" : "dine",
   };
 }
 
@@ -79,4 +80,18 @@ function sanitizeHistory(raw, validIds) {
     .filter(e => e && validIds.includes(e.id) && Number.isFinite(e.at))
     .slice(0, HISTORY_MAX)
     .map(e => ({ id: e.id, at: e.at }));
+}
+
+const DELIVERY_APPS = [
+  { id: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
+  { id: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
+];
+
+function isAndroid(ua) { return /android/i.test(ua || ""); }
+
+// Android: intent URL (opens the app, else Play Store). Elsewhere: the web page.
+function deliveryUrl(app, ua) {
+  if (!isAndroid(ua)) return app.web;
+  const play = encodeURIComponent("https://play.google.com/store/apps/details?id=" + app.pkg);
+  return "intent://#Intent;package=" + app.pkg + ";S.browser_fallback_url=" + play + ";end";
 }

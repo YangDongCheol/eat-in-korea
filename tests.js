@@ -26,7 +26,7 @@ const M = [
   mk("noodle", "땅콩국수", 0, "light", ["nuts"]),
   mk("tteok", "떡볶이", 3, "light", ["seafood"]),
 ];
-const A = (restrictions, spice, feel) => ({ restrictions, spice, feel });
+const A = (restrictions, spice, feel, mode = "dine") => ({ restrictions, spice, feel, mode });
 const T = 1_000_000_000_000, H = 3600 * 1000;
 const RANDS = [() => 0, () => 0.5, () => 0.99];
 const ids = (args) => [...new Set(RANDS.map(r => pick(...args, r).menu.id))].sort();
@@ -140,6 +140,35 @@ test("sanitizeAnswers keeps valid", () => {
 test("sanitizeAnswers returns new object", () => {
   const out = sanitizeAnswers(null);
   eq(out !== DEFAULT_ANSWERS && out.restrictions !== DEFAULT_ANSWERS.restrictions, true);
+});
+
+test("sanitizeAnswers mode", () => {
+  eq(sanitizeAnswers({ mode: "delivery" }).mode, "delivery");
+  for (const raw of [{ mode: "fly" }, { mode: 5 }, {}]) eq(sanitizeAnswers(raw).mode, "dine");
+});
+test("sanitizeAnswers old stored value", () => {
+  eq(sanitizeAnswers({ restrictions: ["nuts"], spice: "hot", feel: "light" }), A(["nuts"], "hot", "light", "dine"));
+});
+const UA_AND = "Mozilla/5.0 (Linux; Android 14; SM-S936N) AppleWebKit/537.36";
+const UA_IOS = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)";
+const playFb = pkg => "intent://#Intent;package=" + pkg + ";S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3D" + pkg + ";end";
+test("DELIVERY_APPS", () => {
+  eq(DELIVERY_APPS, [
+    { id: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
+    { id: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
+  ]);
+});
+test("isAndroid", () => {
+  eq(isAndroid(UA_AND), true);
+  eq(isAndroid("linux android"), true);
+  for (const ua of [UA_IOS, "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "", undefined, null]) eq(isAndroid(ua), false);
+});
+test("deliveryUrl android", () => {
+  eq(deliveryUrl(DELIVERY_APPS[0], UA_AND), "intent://#Intent;package=com.coupang.mobile.eats;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.coupang.mobile.eats;end");
+  eq(deliveryUrl(DELIVERY_APPS[1], UA_AND), playFb("com.sampleapp"));
+});
+test("deliveryUrl non-android", () => {
+  for (const ua of [UA_IOS, undefined]) DELIVERY_APPS.forEach(a => eq(deliveryUrl(a, ua), a.web));
 });
 
 const ID = ["a", "b"];
