@@ -60,8 +60,8 @@ const MENUS = [
     spice: 0, feel: "light", contains: ["meat", "seafood"] },
   { id: "tteok-guk", ko: "떡국", emoji: "🥣", rom: "Tteok-guk",
     name: { en: "Rice Cake Soup", zh: "年糕汤" },
-    desc: { en: "Sliced rice cakes in a mild beef or anchovy broth, topped with egg and seaweed. Eaten on New Year's Day. Often served with dumplings (mandu) or ham mixed in, so ask if you avoid pork.", zh: "年糕片在清淡的牛肉或鳀鱼高汤里煮，上面放鸡蛋和海苔，是新年必吃的食物。常配饺子（万头）或加火腿，不吃猪肉请先问清楚。", ko: "얇게 썬 떡을 순한 소고기나 멸치 육수에 끓이고 달걀과 김을 올린 국으로, 설날에 먹어요. 만두를 함께 넣거나 햄을 넣기도 하니 돼지고기를 안 드시면 물어보세요." },
-    spice: 0, feel: "light", contains: ["meat", "seafood"] },
+    desc: { en: "Sliced rice cakes in a mild beef or anchovy broth, topped with egg and seaweed. Eaten on New Year's Day. Often served with dumplings (mandu) or ham mixed in, so ask if you avoid pork.", zh: "年糕片在清淡的牛肉或鳀鱼高汤里煮，上面放鸡蛋和海苔，是新年必吃的食物。常配饺子（万头）或加火腿，不吃猪肉请先问清楚。", ko: "얇게 썬 떡을 순한 소고기나 멸치 육수에 끓이고 달걀과 김을 올린 국으로, 설날에 먹어요. 만두나 햄을 넣는 경우가 많으니 돼지고기를 안 드시면 물어보세요." },
+    spice: 0, feel: "light", contains: ["pork", "meat", "seafood"] },
   { id: "dak-bokkeum-tang", ko: "닭볶음탕", emoji: "🍗", rom: "Dak-bokkeum-tang",
     name: { en: "Spicy Braised Chicken", zh: "辣炖鸡块" },
     desc: { en: "Chicken pieces, potatoes and carrots braised in a spicy red sauce. Usually shared from one big pot.", zh: "鸡块、土豆和胡萝卜用辣酱炖成，通常一大锅大家一起吃。", ko: "닭고기, 감자, 당근을 매콤한 빨간 양념에 졸인 요리예요. 보통 큰 냄비 하나로 나눠 먹어요." },
@@ -164,8 +164,8 @@ const MENUS = [
     spice: 2, feel: "light", contains: [] },
   { id: "ramyeon", ko: "라면", emoji: "🍜", rom: "Ramyeon",
     name: { en: "Korean Ramen", zh: "韩国拉面" },
-    desc: { en: "Spicy instant noodles cooked to order, often with egg and green onion. The soup base usually contains beef and seafood flavorings. Often served with dumplings (mandu) or ham added, so ask if you avoid pork.", zh: "现煮的辣味方便面，常加鸡蛋和葱。汤料通常含有牛肉和海鲜成分。常配饺子（万头）或加火腿，不吃猪肉请先问清楚。", ko: "주문하면 바로 끓여 주는 매운 인스턴트 라면으로, 달걀과 파를 넣는 경우가 많아요. 수프에는 보통 소고기와 해산물 성분이 들어 있어요. 만두나 햄을 넣어 나오기도 하니 돼지고기를 안 드시면 물어보세요." },
-    spice: 2, feel: "light", contains: ["meat", "seafood"] },
+    desc: { en: "Spicy instant noodles cooked to order, often with egg and green onion. The soup base usually contains beef and seafood flavorings. Often served with dumplings (mandu) or ham added, so ask if you avoid pork.", zh: "现煮的辣味方便面，常加鸡蛋和葱。汤料通常含有牛肉和海鲜成分。常配饺子（万头）或加火腿，不吃猪肉请先问清楚。", ko: "주문하면 바로 끓여 주는 매운 인스턴트 라면으로, 달걀과 파를 넣는 경우가 많아요. 수프에는 보통 소고기와 해산물 성분이 들어 있어요. 만두나 햄을 넣어 나오는 경우가 많으니 돼지고기를 안 드시면 물어보세요." },
+    spice: 2, feel: "light", contains: ["pork", "meat", "seafood"] },
 
   // --- Chinese-Korean and Japanese-style ---
   { id: "jjajangmyeon", ko: "짜장면", emoji: "🍝", rom: "Jjajangmyeon",
