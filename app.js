@@ -166,3 +166,5 @@ for (const b of document.querySelectorAll("[data-lang]")) {
 
 buildQuestions();
 renderAll();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
