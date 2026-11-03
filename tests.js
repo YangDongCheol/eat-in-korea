@@ -217,6 +217,10 @@ test("single restriction leaves enough", () => {
   for (const r of ["pork", "seafood", "nuts"]) if (allowedCount([r], "hot") < 20) throw new Error(`${r}: ${allowedCount([r], "hot")}`);
   if (allowedCount(["vegetarian"], "hot") < 8) throw new Error(`vegetarian: ${allowedCount(["vegetarian"], "hot")}`);
 });
+test("vegetarian hearty has menus", () => {
+  const n = MENUS.filter(m => allowed(m, A(["vegetarian"], "hot", "hearty"))).length;
+  if (n < 2) throw new Error(`only ${n}`);
+});
 test("all four restrictions still has menus", () => {
   const n = allowedCount(["pork", "vegetarian", "seafood", "nuts"], "none");
   if (n < 3) throw new Error(`only ${n}`);
