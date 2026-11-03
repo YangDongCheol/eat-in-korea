@@ -249,7 +249,7 @@ test("MENUS zh has chinese", () => {
     if (!/[一-鿿]/.test(v)) throw new Error(`${m.id} zh has no hanzi`);
 });
 test("MENUS no guarantee claims", () => {
-  for (const m of MENUS) for (const v of [m.name.en, m.name.zh, m.desc.en, m.desc.zh])
+  for (const m of MENUS) for (const v of [m.ko, m.name.en, m.name.zh, m.desc.en, m.desc.zh, m.desc.ko])
     for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${m.id} contains "${w}"`);
 });
 const allowedCount = (restrictions, spice) => MENUS.filter(m => allowed(m, A(restrictions, spice, "any"))).length;
@@ -261,6 +261,13 @@ test("MENUS desc mentioning nuts is tagged nuts", () => {
   const nutWords = /\b(nuts?|peanuts?|walnuts?|almonds?|chestnuts?)\b|坚果|花生|核桃|松子|杏仁|栗/i;
   for (const m of MENUS) if (nutWords.test(m.desc.en + " " + m.desc.zh) && !m.contains.includes("nuts"))
     throw new Error(`${m.id} mentions nuts but has no nuts tag`);
+});
+test("MENUS ko desc", () => {
+  for (const m of MENUS) if (!nonEmpty(m.desc.ko) || !/[가-힣]/.test(m.desc.ko)) throw new Error(`${m.id} desc.ko missing or no hangul`);
+});
+test("MENUS ko nut keywords imply nuts tag", () => {
+  for (const m of MENUS) if (/견과|땅콩|호두|잣|아몬드/.test(m.desc.ko) && !m.contains.includes("nuts"))
+    throw new Error(`${m.id} desc.ko mentions nuts but has no nuts tag`);
 });
 test("vegetarian hearty has menus", () => {
   const n = MENUS.filter(m => allowed(m, A(["vegetarian"], "hot", "hearty"))).length;
