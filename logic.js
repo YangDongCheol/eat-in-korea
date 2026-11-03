@@ -83,15 +83,15 @@ function sanitizeHistory(raw, validIds) {
 }
 
 const DELIVERY_APPS = [
-  { id: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
-  { id: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
+  { id: "coupangeats", scheme: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
+  { id: "baemin", scheme: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
 ];
 
 function isAndroid(ua) { return /android/i.test(ua || ""); }
 
-// Android: intent URL (opens the app, else Play Store). Elsewhere: the web page.
+// Android: intent URL with the app's own scheme so Chrome resolves it (opens the app, else Play Store). Elsewhere: the web page.
 function deliveryUrl(app, ua) {
   if (!isAndroid(ua)) return app.web;
   const play = encodeURIComponent("https://play.google.com/store/apps/details?id=" + app.pkg);
-  return "intent://#Intent;package=" + app.pkg + ";S.browser_fallback_url=" + play + ";end";
+  return "intent://#Intent;scheme=" + app.scheme + ";package=" + app.pkg + ";S.browser_fallback_url=" + play + ";end";
 }

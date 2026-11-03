@@ -1,5 +1,5 @@
 // Bump the version whenever any cached file changes, or phones keep serving the old copy.
-const CACHE = "eik-v4";
+const CACHE = "eik-v5";
 const FILES = ["./", "index.html", "style.css", "app.js", "logic.js", "menus.js", "strings.js", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {

@@ -36,9 +36,9 @@
 - 모든 배달 결과 화면에는 기존 `disclaimer`가 그대로 보인다.
 
 ### 3.4 앱 열기 (`logic.js`)
-- `DELIVERY_APPS = [{ id: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" }, { id: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" }]` (폰에서 두 패키지 이름을 확인했다).
+- `DELIVERY_APPS = [{ id: "coupangeats", scheme: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" }, { id: "baemin", scheme: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" }]` (폰에서 두 패키지 이름을 확인했다).
 - `isAndroid(userAgent)`: 대소문자 구분 없이 `android`가 들어 있으면 `true`.
-- `deliveryUrl(app, userAgent)`: 안드로이드면 `intent://#Intent;package=<pkg>;S.browser_fallback_url=<인코딩한 https://play.google.com/store/apps/details?id=<pkg>>;end`, 그 외에는 `app.web`. 안드로이드 크롬과 안드로이드 껍데기(WebView)는 `window.location.assign(url)`로 이동한다 (`window.open` 안 씀).
+- `deliveryUrl(app, userAgent)`: 안드로이드면 `intent://#Intent;scheme=<scheme>;package=<pkg>;S.browser_fallback_url=<인코딩한 https://play.google.com/store/apps/details?id=<pkg>>;end`, 그 외에는 `app.web`. 안드로이드 크롬과 안드로이드 껍데기(WebView)는 `window.location.assign(url)`로 이동한다 (`window.open` 안 씀). Device test: the package-only form opened the Play Store in Chrome even with the apps installed; with the app's own BROWSABLE scheme Chrome resolves to the installed app (verified by querying the phone).
 - 메뉴를 검색해 주는 앱 내부 주소는 공개된 규격이 없어서 쓰지 않는다 ("바로가기까지만").
 
 ## 4. 카드 제목 걸침 수정

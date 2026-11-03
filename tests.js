@@ -151,11 +151,10 @@ test("sanitizeAnswers old stored value", () => {
 });
 const UA_AND = "Mozilla/5.0 (Linux; Android 14; SM-S936N) AppleWebKit/537.36";
 const UA_IOS = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)";
-const playFb = pkg => "intent://#Intent;package=" + pkg + ";S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3D" + pkg + ";end";
 test("DELIVERY_APPS", () => {
   eq(DELIVERY_APPS, [
-    { id: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
-    { id: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
+    { id: "coupangeats", scheme: "coupangeats", pkg: "com.coupang.mobile.eats", web: "https://www.coupangeats.com/" },
+    { id: "baemin", scheme: "baemin", pkg: "com.sampleapp", web: "https://www.baemin.com/" },
   ]);
 });
 test("isAndroid", () => {
@@ -164,8 +163,8 @@ test("isAndroid", () => {
   for (const ua of [UA_IOS, "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "", undefined, null]) eq(isAndroid(ua), false);
 });
 test("deliveryUrl android", () => {
-  eq(deliveryUrl(DELIVERY_APPS[0], UA_AND), "intent://#Intent;package=com.coupang.mobile.eats;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.coupang.mobile.eats;end");
-  eq(deliveryUrl(DELIVERY_APPS[1], UA_AND), playFb("com.sampleapp"));
+  eq(deliveryUrl(DELIVERY_APPS[0], UA_AND), "intent://#Intent;scheme=coupangeats;package=com.coupang.mobile.eats;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.coupang.mobile.eats;end");
+  eq(deliveryUrl(DELIVERY_APPS[1], UA_AND), "intent://#Intent;scheme=baemin;package=com.sampleapp;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.sampleapp;end");
 });
 test("deliveryUrl non-android", () => {
   for (const ua of [UA_IOS, undefined]) DELIVERY_APPS.forEach(a => eq(deliveryUrl(a, ua), a.web));
