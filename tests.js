@@ -154,6 +154,34 @@ test("sanitizeHistory caps at 100", () => {
   eq(sanitizeHistory(raw, ID).length, 100);
 });
 
+// --- strings ---
+const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove"];
+test("strings keys match", () => {
+  const en = Object.keys(STRINGS.en).sort();
+  eq(en, Object.keys(STRINGS.zh).sort());
+  eq(en, [...STRING_KEYS].sort());
+});
+test("strings not empty", () => {
+  for (const l of ["en", "zh"]) for (const [k, v] of Object.entries(STRINGS[l]))
+    if (typeof v !== "string" || !v.trim()) throw new Error(`${l}.${k} empty`);
+});
+test("strings en disclaimer exact", () => {
+  eq(STRINGS.en.disclaimer, "Ingredients shown are what this dish usually contains. Every restaurant is different, so always check with the staff. This app is not a substitute for allergy care.");
+});
+test("strings zh has chinese", () => {
+  for (const [k, v] of Object.entries(STRINGS.zh))
+    if (!["title", "langEn", "langZh"].includes(k) && !/[\u4e00-\u9fff]/.test(v)) throw new Error(`zh.${k} has no hanzi`);
+});
+test("strings no guarantee claims", () => {
+  const bad = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证"];
+  for (const l of ["en", "zh"]) for (const [k, v] of Object.entries(STRINGS[l]))
+    for (const w of bad) if (v.toLowerCase().includes(w)) throw new Error(`${l}.${k} contains "${w}"`);
+});
+test("detectLang", () => {
+  for (const z of ["zh-CN", "zh-TW", "ZH"]) eq(detectLang(z), "zh");
+  for (const e of ["en-US", "ko-KR", "", undefined, null]) eq(detectLang(e), "en");
+});
+
 // --- report ---
 function report() {
   const failed = results.filter(r => !r.ok);
