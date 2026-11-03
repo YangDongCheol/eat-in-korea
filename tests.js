@@ -184,31 +184,43 @@ test("sanitizeHistory caps at 100", () => {
 });
 
 // --- strings ---
-const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原"];
-const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel"];
+const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장"];
+const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qMode", "modeDine", "modeDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo"];
 test("strings keys match", () => {
   const en = Object.keys(STRINGS.en).sort();
   eq(en, Object.keys(STRINGS.zh).sort());
+  eq(en, Object.keys(STRINGS.ko).sort());
   eq(en, [...STRING_KEYS].sort());
 });
 test("strings not empty", () => {
-  for (const l of ["en", "zh"]) for (const [k, v] of Object.entries(STRINGS[l]))
+  for (const l of ["en", "zh", "ko"]) for (const [k, v] of Object.entries(STRINGS[l]))
     if (typeof v !== "string" || !v.trim()) throw new Error(`${l}.${k} empty`);
 });
 test("strings en disclaimer exact", () => {
   eq(STRINGS.en.disclaimer, "Ingredients shown are what this dish usually contains. Every restaurant is different, so always check with the staff. This app is not a substitute for allergy care.");
 });
+test("strings ko disclaimer exact", () => {
+  eq(STRINGS.ko.disclaimer, "표시된 재료는 이 음식에 보통 들어가는 재료예요. 식당마다 다르니 꼭 직원에게 확인하세요. 이 앱은 알레르기 대비를 대신하지 않아요.");
+});
+test("strings ko has hangul", () => {
+  for (const [k, v] of Object.entries(STRINGS.ko))
+    if (!["title", "langEn", "langZh", "deliveryCoupang", "deliveryBaemin"].includes(k) && !/[가-힣]/.test(v)) throw new Error(`ko.${k} has no hangul`);
+});
+test("strings placeholders", () => {
+  for (const l of ["en", "zh", "ko"]) eq(STRINGS[l].deliveryHint.split("{name}").length - 1, 1);
+});
 test("strings zh has chinese", () => {
   for (const [k, v] of Object.entries(STRINGS.zh))
-    if (!["title", "langEn", "langZh"].includes(k) && !/[\u4e00-\u9fff]/.test(v)) throw new Error(`zh.${k} has no hanzi`);
+    if (!["title", "langEn", "langZh", "langKo", "deliveryCoupang", "deliveryBaemin"].includes(k) && !/[\u4e00-\u9fff]/.test(v)) throw new Error(`zh.${k} has no hanzi`);
 });
 test("strings no guarantee claims", () => {
-  for (const l of ["en", "zh"]) for (const [k, v] of Object.entries(STRINGS[l]))
+  for (const l of ["en", "zh", "ko"]) for (const [k, v] of Object.entries(STRINGS[l]))
     for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${l}.${k} contains "${w}"`);
 });
 test("detectLang", () => {
   for (const z of ["zh-CN", "zh-TW", "ZH"]) eq(detectLang(z), "zh");
-  for (const e of ["en-US", "ko-KR", "", undefined, null]) eq(detectLang(e), "en");
+  for (const k of ["ko-KR", "KO", "ko"]) eq(detectLang(k), "ko");
+  for (const e of ["en-US", "ja-JP", "", undefined, null]) eq(detectLang(e), "en");
 });
 
 // --- menus ---
