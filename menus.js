@@ -317,7 +317,7 @@ const MENUS = [
   { id: "gyeranppang", ko: "계란빵", emoji: "🥚", rom: "Gyeranppang",
     name: { en: "Egg Bread", zh: "鸡蛋面包" },
     desc: { en: "A small, fluffy sweet bread baked with a whole egg on top. A warm street snack in winter. Some vendors add ham, so ask if you avoid pork.", zh: "小巧松软的甜面包，上面烤着一整个鸡蛋，是冬天的热乎街头小吃。有些摊位会加火腿，不吃猪肉请先问清楚。", ko: "달걀 한 개를 통째로 올려 구운 작고 폭신한 달콤한 빵으로, 겨울에 따뜻하게 먹는 길거리 간식이에요. 햄을 넣는 가게도 있으니 돼지고기를 안 드시면 물어보세요." },
-    spice: 0, feel: "light", contains: [] },
+    spice: 0, feel: "light", contains: ["pork", "meat"] },
   { id: "goguma", ko: "군고구마", emoji: "🍠", rom: "Gun-goguma",
     name: { en: "Roasted Sweet Potato", zh: "烤红薯" },
     desc: { en: "Whole sweet potatoes roasted until soft and sweet, sold from street carts in winter.", zh: "整个红薯烤到软糯香甜，冬天在街边小摊有卖。", ko: "고구마를 통째로 부드럽고 달게 구운 간식으로, 겨울에 길거리 리어카에서 팔아요." },

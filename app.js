@@ -90,11 +90,12 @@ function renderHint() {
   const el = $("delivery-hint");
   if (!hint || !current || answers.mode !== "delivery") return el.replaceChildren();
   const t = STRINGS[lang];
-  if (hint === "copied") return el.replaceChildren(t.deliveryHint.replace("{name}", current.ko));
-  const name = document.createElement("strong");
-  name.lang = "ko";
-  name.textContent = current.ko;
-  el.replaceChildren(t.deliveryCopyFailed, name);
+  const mark = (tag) => Object.assign(document.createElement(tag), { lang: "ko", textContent: current.ko });
+  if (hint === "copied") {
+    const [before, after] = t.deliveryHint.split("{name}");
+    return el.replaceChildren(before, mark("span"), after);
+  }
+  el.replaceChildren(t.deliveryCopyFailed, mark("strong"));
 }
 
 function renderStaff() {

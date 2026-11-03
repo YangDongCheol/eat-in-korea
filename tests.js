@@ -206,6 +206,9 @@ test("strings ko has hangul", () => {
   for (const [k, v] of Object.entries(STRINGS.ko))
     if (!["title", "langEn", "langZh", "deliveryCoupang", "deliveryBaemin"].includes(k) && !/[가-힣]/.test(v)) throw new Error(`ko.${k} has no hangul`);
 });
+test("strings ko nut labels mention peanuts", () => {
+  for (const k of ["optNuts", "tagNuts"]) if (!STRINGS.ko[k].includes("땅콩")) throw new Error(`ko.${k} lacks 땅콩`);
+});
 test("strings placeholders", () => {
   for (const l of ["en", "zh", "ko"]) eq(STRINGS[l].deliveryHint.split("{name}").length - 1, 1);
 });
@@ -261,6 +264,10 @@ test("MENUS desc mentioning nuts is tagged nuts", () => {
   const nutWords = /\b(nuts?|peanuts?|walnuts?|almonds?|chestnuts?)\b|坚果|花生|核桃|松子|杏仁|栗/i;
   for (const m of MENUS) if (nutWords.test(m.desc.en + " " + m.desc.zh) && !m.contains.includes("nuts"))
     throw new Error(`${m.id} mentions nuts but has no nuts tag`);
+});
+test("MENUS desc mentioning pork products is tagged pork", () => {
+  for (const m of MENUS) if (/\b(pork|ham|bacon|sausage|spam|mandu|dumplings?)\b/i.test(m.desc.en) && !m.contains.includes("pork"))
+    throw new Error(`${m.id} desc mentions pork but is not tagged`);
 });
 test("MENUS ko desc", () => {
   for (const m of MENUS) if (!nonEmpty(m.desc.ko) || !/[가-힣]/.test(m.desc.ko)) throw new Error(`${m.id} desc.ko missing or no hangul`);
