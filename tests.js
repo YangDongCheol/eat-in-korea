@@ -360,6 +360,13 @@ test("MENUS batch B1 safety tags", () => {
   need(["gom-tang", "sogogi-muguk", "dak-hanmari", "dak-gomtang", "bulgogi-jeongol", "gopchang-jeongol"], ["meat"]);
   need(["kimchi-jjim", "jjageuri"], ["pork", "meat", "seafood"]);
 });
+test("MENUS batch B2 safety tags", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
+  need(["nakji-deopbap", "al-bap", "ojingeo-deopbap", "gul-bap", "saeu-bokkeumbap", "chamchi-mayo-deopbap", "yubu-chobap", "jangeo-gui", "yeoneo-deopbap"], ["seafood"]);
+  need(["jeyuk-deopbap", "moksal-gui", "hangjeongsal-gui", "galmaegisal", "makchang-gui", "daepae-samgyeopsal", "tteok-galbi"], ["pork", "meat"]);
+  need(["bulgogi-deopbap", "ori-bulgogi", "hunje-ori", "chadol-bagi", "dak-kkochi", "sogogi-gukbap"], ["meat"]);
+});
 test("MENUS ways valid", () => {
   for (const m of MENUS) {
     const ok = Array.isArray(m.ways) && m.ways.includes("dine") && new Set(m.ways).size === m.ways.length && m.ways.every(w => ["dine", "delivery", "home"].includes(w));
