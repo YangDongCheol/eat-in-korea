@@ -108,3 +108,17 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 #staff ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
 #staff li { font-size: 1.7rem; line-height: 1.4; padding-top: 14px; border-top: 2px solid #ddd; }
 #staff > button.link { color: #444; }
+
+/* modes */
+#modes { display: flex; flex-direction: column; gap: 12px; }
+.mode-card {
+  display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left;
+  min-height: 88px; padding: 16px 20px; border-radius: 24px;
+  border: 2px solid var(--card-border); background: var(--card); color: var(--fg);
+  box-shadow: var(--shadow); transition: transform .12s;
+}
+.mode-card:active { transform: scale(.97); }
+.mode-name { font-size: 1.5rem; font-weight: 800; }
+.mode-desc { font-size: .95rem; color: var(--muted); }
+.diet-note { border-color: var(--accent); background: var(--accent-soft); color: var(--fg); font-weight: 600; }
+#ask > button.link { align-self: flex-start; }

@@ -1,10 +1,10 @@
 // UI: ask -> result -> staff card, plus history. Logic lives in logic.js, text in strings.js.
-const QUESTIONS = [
-  ["way", "qWay", false, [["dine", "wayDine", "🍴"], ["delivery", "wayDelivery", "🛵"]]],
-  ["restrictions", "qRestrict", true, [["pork", "optPork", "🐷"], ["vegetarian", "optVeg", "🥬"], ["seafood", "optSeafood", "🐟"], ["nuts", "optNuts", "🥜"]]],
-  ["spice", "qSpice", false, [["none", "spiceNone", "🙂"], ["mild", "spiceMild", "🌶️"], ["hot", "spiceHot", "🔥"]]],
-  ["feel", "qFeel", false, [["hearty", "feelHearty", "🍖"], ["light", "feelLight", "🥗"], ["any", "feelAny", "🎲"]]],
-];
+const QUESTION_DEFS = {
+  way: { qKey: "qWay", multi: false, options: [["dine", "wayDine", "🍴"], ["delivery", "wayDelivery", "🛵"], ["home", "wayHome", "🍳"]] },
+  restrictions: { qKey: "qRestrict", multi: true, options: [["pork", "optPork", "🐷"], ["vegetarian", "optVeg", "🥬"], ["seafood", "optSeafood", "🐟"], ["nuts", "optNuts", "🥜"]] },
+  spice: { qKey: "qSpice", multi: false, options: [["none", "spiceNone", "🙂"], ["mild", "spiceMild", "🌶️"], ["hot", "spiceHot", "🔥"]] },
+  feel: { qKey: "qFeel", multi: false, options: [["hearty", "feelHearty", "🍖"], ["light", "feelLight", "🥗"], ["any", "feelAny", "🎲"]] },
+};
 const TAGS = { pork: "tagPork", meat: "tagMeat", seafood: "tagSeafood", nuts: "tagNuts" };
 const $ = (id) => document.getElementById(id);
 
@@ -15,6 +15,7 @@ const savedLang = loadJSON(store, "eik:lang", null);
 let lang = ["en", "zh", "ko"].includes(savedLang) ? savedLang : detectLang(navigator.language);
 const answers = sanitizeAnswers(loadJSON(store, "eik:lastAnswers", null));
 let history = sanitizeHistory(loadJSON(store, "eik:history", []), MENUS.map(m => m.id));
+let currentMode = "meal";
 let shown = [];
 let current = null;
 let recorded = false;
@@ -28,9 +29,12 @@ function show(id, focusId) {
   if (focusId) $(focusId).focus();
 }
 
-// Built once; taps only flip aria-pressed so the focused button survives.
+// Rebuilt on mode entry; taps only flip aria-pressed so the focused button survives.
 function buildQuestions() {
-  for (const [key, qKey, multi, options] of QUESTIONS) {
+  chipLabels.length = 0;
+  $("questions").replaceChildren();
+  for (const key of MODES[currentMode].questions) {
+    const { qKey, multi, options } = QUESTION_DEFS[key];
     const fs = document.createElement("fieldset");
     const lg = document.createElement("legend");
     lg.dataset.s = qKey;
@@ -60,11 +64,13 @@ function renderResult() {
   const m = current;
   $("menu").hidden = !m;
   $("no-match").hidden = Boolean(m);
-  const delivery = answers.way === "delivery";
+  const way = answers.way;
   $("another").hidden = !m;
-  $("staff-btn").hidden = !m || delivery || lang === "ko";
-  $("nearby").hidden = !m || delivery;
-  $("delivery-coupang").hidden = $("delivery-baemin").hidden = !m || !delivery;
+  $("staff-btn").hidden = !m || way !== "dine" || lang === "ko";
+  $("nearby").hidden = !m || way !== "dine";
+  $("recipe-btn").hidden = !m || way !== "home";
+  $("delivery-coupang").hidden = $("delivery-baemin").hidden = !m || way !== "delivery";
+  $("diet-note").hidden = !m || currentMode !== "diet";
   renderHint();
   if (!m) return;
   $("menu-emoji").textContent = m.emoji;
@@ -151,7 +157,7 @@ function renderAll() {
 }
 
 function showPick() {
-  const { menu, cycled } = pick(MENUS, answers, history, shown, Date.now());
+  const { menu, cycled } = pick(MENUS.filter(MODES[currentMode].pool), answers, history, shown, Date.now());
   current = menu;
   recorded = false;
   hint = null;
@@ -179,6 +185,8 @@ $("go").onclick = () => {
 };
 $("another").onclick = showPick;
 $("back").onclick = () => { hint = null; renderHint(); show("ask", "ask-title"); };
+$("ask-back").onclick = () => show("home", "home-title");
+$("recipe-btn").onclick = () => { record(); window.open(recipeUrl(current, lang), "_blank", "noopener"); };
 $("staff-btn").onclick = () => { record(); renderStaff(); show("staff", "staff-dish"); };
 $("nearby").onclick = () => { record(); window.open(mapsUrl(current, lang), "_blank", "noopener"); };
 function navigate(url) { window.location.assign(url); } // global so manual checks can override it
@@ -191,12 +199,32 @@ for (const [id, app] of [["delivery-coupang", DELIVERY_APPS[0]], ["delivery-baem
   };
 }
 $("staff-back").onclick = () => show("result", "menu-name");
-$("to-history").onclick = () => { show("history", "history-title"); };
-$("history-back").onclick = () => show("ask", "ask-title");
+$("home-history").onclick = () => show("history", "history-title");
+$("history-back").onclick = () => show("home", "home-title");
 for (const b of document.querySelectorAll("[data-lang]")) {
   b.onclick = () => { lang = b.dataset.lang; saveJSON(store, "eik:lang", lang); renderAll(); };
 }
 
+for (const mode of Object.keys(MODES)) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "mode-card";
+  b.dataset.mode = mode;
+  for (const [cls, k] of [["mode-name", MODES[mode].labelKey], ["mode-desc", MODES[mode].descKey]]) {
+    const sp = document.createElement("span");
+    sp.className = cls;
+    sp.dataset.s = k;
+    b.append(sp);
+  }
+  b.onclick = () => {
+    currentMode = mode;
+    shown = []; current = null; hint = null; recorded = false;
+    buildQuestions();
+    renderAll();
+    show("ask", "ask-title");
+  };
+  $("modes").append(b);
+}
 buildQuestions();
 renderAll();
 

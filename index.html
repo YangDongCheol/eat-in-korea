@@ -17,12 +17,19 @@
     <button type="button" data-lang="ko" data-s="langKo"></button>
   </div>
 
-  <section id="ask">
+  <section id="home">
+    <h1 id="home-title" tabindex="-1" data-s="title"></h1>
+    <p class="sub" data-s="pickMode"></p>
+    <div id="modes"></div>
+    <button id="home-history" class="link" data-s="historyLink"></button>
+  </section>
+
+  <section id="ask" hidden>
+    <button id="ask-back" class="link" data-s="backToModes"></button>
     <h1 id="ask-title" tabindex="-1" data-s="title"></h1>
     <p class="sub" data-s="subtitle"></p>
     <div id="questions"></div>
     <button id="go" class="primary" data-s="go"></button>
-    <button id="to-history" class="link" data-s="historyLink"></button>
   </section>
 
   <section id="result" hidden>
@@ -41,9 +48,11 @@
       <h2 id="no-match-title" tabindex="-1" data-s="noMatch"></h2>
       <p class="desc" data-s="noMatchHint"></p>
     </div>
+    <p id="diet-note" class="disclaimer diet-note" data-s="dietNote"></p>
     <p class="disclaimer" data-s="disclaimer"></p>
     <button id="staff-btn" class="primary" data-s="showStaff"></button>
     <button id="nearby" data-s="findNearby"></button>
+    <button id="recipe-btn" class="primary" data-s="recipe"></button>
     <button id="delivery-coupang" lang="ko" class="primary" data-s="deliveryCoupang"></button>
     <button id="delivery-baemin" lang="ko" data-s="deliveryBaemin"></button>
     <p id="delivery-hint" class="hint" aria-live="polite"></p>
@@ -67,6 +76,7 @@
 </main>
 <script src="strings.js"></script>
 <script src="menus.js"></script>
+<script src="modes.js"></script>
 <script src="logic.js"></script>
 <script src="app.js"></script>
 </body>
