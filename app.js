@@ -1,6 +1,6 @@
 // UI: ask -> result -> staff card, plus history. Logic lives in logic.js, text in strings.js.
 const QUESTIONS = [
-  ["mode", "qMode", false, [["dine", "modeDine", "🍴"], ["delivery", "modeDelivery", "🛵"]]],
+  ["way", "qMode", false, [["dine", "modeDine", "🍴"], ["delivery", "modeDelivery", "🛵"]]],
   ["restrictions", "qRestrict", true, [["pork", "optPork", "🐷"], ["vegetarian", "optVeg", "🥬"], ["seafood", "optSeafood", "🐟"], ["nuts", "optNuts", "🥜"]]],
   ["spice", "qSpice", false, [["none", "spiceNone", "🙂"], ["mild", "spiceMild", "🌶️"], ["hot", "spiceHot", "🔥"]]],
   ["feel", "qFeel", false, [["hearty", "feelHearty", "🍖"], ["light", "feelLight", "🥗"], ["any", "feelAny", "🎲"]]],
@@ -60,7 +60,7 @@ function renderResult() {
   const m = current;
   $("menu").hidden = !m;
   $("no-match").hidden = Boolean(m);
-  const delivery = answers.mode === "delivery";
+  const delivery = answers.way === "delivery";
   $("another").hidden = !m;
   $("staff-btn").hidden = !m || delivery || lang === "ko";
   $("nearby").hidden = !m || delivery;
@@ -88,7 +88,7 @@ const menuName = (m) => lang === "ko" ? m.ko : m.name[lang];
 
 function renderHint() {
   const el = $("delivery-hint");
-  if (!hint || !current || answers.mode !== "delivery") return el.replaceChildren();
+  if (!hint || !current || answers.way !== "delivery") return el.replaceChildren();
   const t = STRINGS[lang];
   const mark = (tag) => Object.assign(document.createElement(tag), { lang: "ko", textContent: current.ko });
   if (hint === "copied") {
@@ -180,7 +180,7 @@ $("go").onclick = () => {
 $("another").onclick = showPick;
 $("back").onclick = () => { hint = null; renderHint(); show("ask", "ask-title"); };
 $("staff-btn").onclick = () => { record(); renderStaff(); show("staff", "staff-dish"); };
-$("nearby").onclick = () => { record(); window.open(mapsUrl(current), "_blank", "noopener"); };
+$("nearby").onclick = () => { record(); window.open(mapsUrl(current, lang), "_blank", "noopener"); };
 function navigate(url) { window.location.assign(url); } // global so manual checks can override it
 for (const [id, app] of [["delivery-coupang", DELIVERY_APPS[0]], ["delivery-baemin", DELIVERY_APPS[1]]]) {
   $(id).onclick = async () => {

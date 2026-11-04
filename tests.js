@@ -26,7 +26,7 @@ const M = [
   mk("noodle", "땅콩국수", 0, "light", ["nuts"]),
   mk("tteok", "떡볶이", 3, "light", ["seafood"]),
 ];
-const A = (restrictions, spice, feel, mode = "dine") => ({ restrictions, spice, feel, mode });
+const A = (restrictions, spice, feel, way = "dine") => ({ restrictions, spice, feel, way });
 const T = 1_000_000_000_000, H = 3600 * 1000;
 const RANDS = [() => 0, () => 0.5, () => 0.99];
 const ids = (args) => [...new Set(RANDS.map(r => pick(...args, r).menu.id))].sort();
@@ -142,9 +142,39 @@ test("sanitizeAnswers returns new object", () => {
   eq(out !== DEFAULT_ANSWERS && out.restrictions !== DEFAULT_ANSWERS.restrictions, true);
 });
 
-test("sanitizeAnswers mode", () => {
-  eq(sanitizeAnswers({ mode: "delivery" }).mode, "delivery");
-  for (const raw of [{ mode: "fly" }, { mode: 5 }, {}]) eq(sanitizeAnswers(raw).mode, "dine");
+test("sanitizeAnswers way", () => {
+  eq(sanitizeAnswers({ way: "home" }).way, "home");
+  eq(sanitizeAnswers({ way: "delivery" }).way, "delivery");
+  for (const raw of [{ way: "fly" }, { way: 5 }, {}]) eq(sanitizeAnswers(raw).way, "dine");
+});
+test("sanitizeAnswers old mode", () => {
+  const out = sanitizeAnswers({ restrictions: ["nuts"], spice: "hot", feel: "light", mode: "delivery" });
+  eq(out, A(["nuts"], "hot", "light", "delivery"));
+  eq("mode" in out, false);
+  eq(sanitizeAnswers({ mode: "dine" }).way, "dine");
+  eq(sanitizeAnswers({ mode: "home" }).way, "dine");
+  eq(sanitizeAnswers({ way: "home", mode: "delivery" }).way, "home");
+});
+test("allowed ways", () => {
+  const m = { ...M[0], contains: [], spice: 0, feel: "any" };
+  const w = { ...m, ways: ["dine", "delivery"] };
+  eq(allowed(w, A([], "none", "any", "home")), false);
+  eq(allowed(w, A([], "none", "any", "delivery")), true);
+  eq(allowed(m, A([], "none", "any", "dine")), true);
+  eq(allowed(m, A([], "none", "any", "delivery")), false);
+  eq(allowed(m, A([], "none", "any", "home")), false);
+});
+test("mapsUrl ko", () => {
+  eq(mapsUrl({ ko: "김치찌개" }, "ko"), "https://map.naver.com/p/search/" + encodeURIComponent("근처 김치찌개"));
+  for (const l of ["en", "zh", undefined]) eq(mapsUrl({ ko: "김치찌개" }, l), "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("김치찌개 식당"));
+});
+test("recipeUrl", () => {
+  const k = { ko: "김치찌개", name: { en: "Kimchi Stew", zh: "泡菜汤" } };
+  const base = "https://www.youtube.com/results?search_query=";
+  eq(recipeUrl(k, "ko"), base + encodeURIComponent("김치찌개 레시피"));
+  eq(recipeUrl(k, "en"), base + encodeURIComponent("Kimchi Stew recipe"));
+  eq(recipeUrl(k, "zh"), base + encodeURIComponent("泡菜汤 食谱"));
+  eq(recipeUrl({ ko: "떡볶이 & 튀김", name: { en: "A & B", zh: "甲" } }, "ko").endsWith(encodeURIComponent("떡볶이 & 튀김 레시피")), true);
 });
 test("sanitizeAnswers old stored value", () => {
   eq(sanitizeAnswers({ restrictions: ["nuts"], spice: "hot", feel: "light" }), A(["nuts"], "hot", "light", "dine"));

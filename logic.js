@@ -10,7 +10,8 @@ function allowed(menu, a) {
     && !(r.includes("seafood") && has("seafood"))
     && !(r.includes("nuts") && has("nuts"))
     && (a.spice === "hot" || menu.spice <= (a.spice === "none" ? 0 : 1))
-    && (a.feel === "any" || menu.feel === a.feel);
+    && (a.feel === "any" || menu.feel === a.feel)
+    && (menu.ways || ["dine"]).includes(a.way);
 }
 
 // Returns { menu, cycled }. cycled: every allowed menu was already shown this session — caller resets shown to [menu.id].
@@ -30,7 +31,7 @@ function pick(menus, answers, history, shown, now, rand = Math.random) {
   return { menu: oldest, cycled };
 }
 
-const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any", mode: "dine" };
+const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any", way: "dine" };
 const RESTRICTIONS = ["pork", "vegetarian", "seafood", "nuts"]; // also the notes order
 const NOTES = {
   pork: "저는 돼지고기를 먹을 수 없어요. 돼지고기나 돼지고기 육수가 들어가나요?",
@@ -44,8 +45,14 @@ function staffCard(menu, restrictions) {
   return { dish: menu.ko, order: "이거 1인분 주세요.", notes: RESTRICTIONS.filter(r => restrictions.includes(r)).map(r => NOTES[r]) };
 }
 
-function mapsUrl(menu) {
+function mapsUrl(menu, lang) {
+  if (lang === "ko") return "https://map.naver.com/p/search/" + encodeURIComponent("근처 " + menu.ko);
   return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(menu.ko + " 식당");
+}
+
+function recipeUrl(menu, lang) {
+  const q = lang === "ko" ? menu.ko + " 레시피" : lang === "zh" ? menu.name.zh + " 食谱" : menu.name.en + " recipe";
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
 }
 
 // Storage may be missing, full, or throw (private mode) — never let that break the app.
@@ -70,7 +77,8 @@ function sanitizeAnswers(raw) {
     restrictions: RESTRICTIONS.filter(x => Array.isArray(r.restrictions) && r.restrictions.includes(x)),
     spice: ["none", "mild", "hot"].includes(r.spice) ? r.spice : DEFAULT_ANSWERS.spice,
     feel: ["hearty", "light", "any"].includes(r.feel) ? r.feel : DEFAULT_ANSWERS.feel,
-    mode: r.mode === "delivery" ? "delivery" : "dine",
+    // r.mode is the pre-modes stored key: only "delivery" carried over.
+    way: ["dine", "delivery", "home"].includes(r.way) ? r.way : r.mode === "delivery" ? "delivery" : DEFAULT_ANSWERS.way,
   };
 }
 
