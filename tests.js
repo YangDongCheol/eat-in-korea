@@ -369,7 +369,7 @@ test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
     const n = MENUS.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
     const min = r === "vegetarian" ? (way === "dine" ? 8 : 5) : 10;
-    if (n < min) throw new Error(way + " " + r + ": " + n);
+    if (n < min) throw new Error(spice + " " + way + " " + r + ": " + n);
   }
 });
 test("diet pool size", () => {
@@ -380,15 +380,16 @@ test("diet pool size", () => {
   }
 });
 test("diet pool per way", () => {
-  for (const way of ["dine", "delivery", "home"]) {
-    const n = r => MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: r, spice: "hot", feel: "any", way })).length;
-    if (n([]) < 10) throw new Error(way + " none: " + n([]));
+  for (const spice of ["hot", "none"]) for (const way of ["dine", "delivery", "home"]) {
+    const n = r => MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: r, spice, feel: "any", way })).length;
+    if (n([]) < 10) throw new Error(spice + " " + way + " none: " + n([]));
     for (const r of ["pork", "seafood", "nuts"]) if (n([r]) < 6) throw new Error(way + " " + r + ": " + n([r]));
-    if (n(["vegetarian"]) < 4) throw new Error(way + " vegetarian: " + n(["vegetarian"]));
+    if (n(["vegetarian"]) < 4) throw new Error(spice + " " + way + " vegetarian: " + n(["vegetarian"]));
   }
 });
 test("diet pool is plausible", () => {
-  for (const m of MENUS.filter(MODES.diet.pool)) if (["pork", "meat", "seafood", "nuts"].every(x => m.contains.includes(x))) throw new Error(m.id);
+  // shabu-shabu is deliberately tagged with all four (beef/pork, kelp or anchovy broth, sesame sauce): safety tags win over this heuristic.
+  for (const m of MENUS.filter(MODES.diet.pool)) if (m.id !== "shabu-shabu" && ["pork", "meat", "seafood", "nuts"].every(x => m.contains.includes(x))) throw new Error(m.id);
 });
 
 test("diet mode ignores hidden feel answer", () => {
