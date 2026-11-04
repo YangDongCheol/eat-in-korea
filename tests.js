@@ -356,7 +356,7 @@ test("MENUS stage2 foreign dishes tagged", () => {
 test("MENUS batch B1 safety tags", () => {
   const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
   const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
-  need(["al-tang", "dongtae-tang", "daegu-tang", "kkotge-tang", "haemul-tang", "jogae-tang", "eomuk-tang", "godeungeo-jorim", "galchi-jorim", "samchi-gui", "ojingeo-guk"], ["seafood"]);
+  need(["al-tang", "dongtae-tang", "daegu-tang", "kkotge-tang", "haemul-tang", "jogae-tang", "eomuk-tang", "godeungeo-jorim", "galchi-jorim", "samchi-gui", "ojingeo-guk", "dak-hanmari"], ["seafood"]);
   need(["gom-tang", "sogogi-muguk", "dak-hanmari", "dak-gomtang", "bulgogi-jeongol", "gopchang-jeongol"], ["meat"]);
   need(["kimchi-jjim", "jjageuri"], ["pork", "meat", "seafood"]);
 });
