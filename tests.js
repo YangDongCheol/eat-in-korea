@@ -375,6 +375,9 @@ test("MENUS batch B3 safety tags", () => {
   const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
   need(["gun-mandu", "mul-mandu", "donggeurangttaeng", "kkwabaro-u", "jjajang-bap", "gochu-japchae"], ["pork", "meat"]);
   need(["jjamppong-bap", "bajirak-kalguksu", "eomuk", "twigim", "rose-tteokbokki", "pajeon"], ["seafood"]);
+  need(["twigim"], ["pork", "meat", "seafood"]);
+  need(["donggeurangttaeng"], ["seafood"]);
+  need(["kkanpunggi"], ["meat", "seafood"]);
   // anchovy/meat broths and kimchi: match janchi-guksu and kalguksu
   need(["kimchi-mari-guksu", "kaljebi", "sujebi", "mak-guksu", "deulkkae-kalguksu"], ["meat", "seafood"]);
   // convention: perilla/sesame are not tagged nuts (see kalguksu-style entries); kong-guksu names peanuts, so it is tagged
