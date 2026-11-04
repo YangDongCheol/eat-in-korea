@@ -362,8 +362,8 @@ test("MENUS ways valid", () => {
 test("MENUS way counts", () => {
   const c = w => MENUS.filter(m => m.ways.includes(w)).length;
   eq(c("dine"), MENUS.length);
-  if (c("delivery") < 89) throw new Error("delivery " + c("delivery"));
-  if (c("home") < 72) throw new Error("home " + c("home"));
+  if (c("delivery") < 90) throw new Error("delivery " + c("delivery"));
+  if (c("home") < 73) throw new Error("home " + c("home"));
 });
 test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
