@@ -366,6 +366,9 @@ test("MENUS batch B2 safety tags", () => {
   need(["nakji-deopbap", "al-bap", "ojingeo-deopbap", "gul-bap", "saeu-bokkeumbap", "chamchi-mayo-deopbap", "yubu-chobap", "jangeo-gui", "yeoneo-deopbap"], ["seafood"]);
   need(["jeyuk-deopbap", "moksal-gui", "hangjeongsal-gui", "galmaegisal", "makchang-gui", "daepae-samgyeopsal", "tteok-galbi"], ["pork", "meat"]);
   need(["bulgogi-deopbap", "ori-bulgogi", "hunje-ori", "chadol-bagi", "dak-kkochi", "sogogi-gukbap"], ["meat"]);
+  need(["sogogi-gukbap", "daepae-samgyeopsal"], ["seafood"]);
+  need(["yubu-chobap"], ["pork", "meat", "seafood"]);
+  need(["dolsot-bap"], ["nuts"]);
 });
 test("MENUS batch B3 safety tags", () => {
   const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
