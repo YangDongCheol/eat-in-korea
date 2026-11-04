@@ -157,7 +157,7 @@ function renderAll() {
 }
 
 function showPick() {
-  const { menu, cycled } = pick(MENUS.filter(MODES[currentMode].pool), answers, history, shown, Date.now());
+  const { menu, cycled } = pick(MENUS.filter(MODES[currentMode].pool), modeAnswers(MODES[currentMode], answers), history, shown, Date.now());
   current = menu;
   recorded = false;
   hint = null;

@@ -376,7 +376,14 @@ test("diet pool is plausible", () => {
 
 // --- report ---
 function report() {
-  const failed = results.filter(r => !r.ok);
+  test("diet mode ignores hidden feel answer", () => {
+  const a = { restrictions: [], spice: "hot", feel: "hearty", way: "dine" };
+  const pool = MENUS.filter(MODES.diet.pool);
+  eq(pool.filter(m => allowed(m, modeAnswers(MODES.diet, a))).length, pool.length);
+  eq(modeAnswers(MODES.meal, a).feel, "hearty");
+  eq(a.feel, "hearty");
+});
+const failed = results.filter(r => !r.ok);
   const summary = `${failed.length ? "FAIL " + failed.length : "PASS " + results.length}/${results.length}`;
   if (typeof document !== "undefined") {
     document.title = summary;
