@@ -270,7 +270,7 @@ test("detectLang", () => {
 // --- menus ---
 const nonEmpty = v => typeof v === "string" && v.trim() !== "";
 test("MENUS size", () => {
-  if (MENUS.length < 60 || MENUS.length > 150) throw new Error(`size ${MENUS.length}`);
+  if (MENUS.length < 60 || MENUS.length > 300) throw new Error(`size ${MENUS.length}`);
 });
 test("MENUS valid", () => {
   const tags = ["pork", "meat", "seafood", "nuts"];
@@ -352,6 +352,13 @@ test("MENUS stage2 foreign dishes tagged", () => {
   for (const id of ["poke", "sushi", "pad-thai", "tom-yum-goong"]) if (!by(id).contains.includes("seafood")) throw new Error(id + " seafood");
   for (const id of ["pizza", "hamburger", "pasta", "burrito", "taco", "steak"]) if (!by(id).contains.includes("meat")) throw new Error(id + " meat");
   if (!by("pad-thai").contains.includes("nuts")) throw new Error("pad-thai nuts");
+});
+test("MENUS batch B1 safety tags", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
+  need(["al-tang", "dongtae-tang", "daegu-tang", "kkotge-tang", "haemul-tang", "jogae-tang", "eomuk-tang", "godeungeo-jorim", "galchi-jorim", "samchi-gui", "ojingeo-guk"], ["seafood"]);
+  need(["gom-tang", "sogogi-muguk", "dak-hanmari", "dak-gomtang", "bulgogi-jeongol", "gopchang-jeongol"], ["meat"]);
+  need(["kimchi-jjim", "jjageuri"], ["pork", "meat", "seafood"]);
 });
 test("MENUS ways valid", () => {
   for (const m of MENUS) {
