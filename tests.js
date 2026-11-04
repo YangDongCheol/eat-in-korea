@@ -270,7 +270,7 @@ test("detectLang", () => {
 // --- menus ---
 const nonEmpty = v => typeof v === "string" && v.trim() !== "";
 test("MENUS size", () => {
-  if (MENUS.length < 60 || MENUS.length > 80) throw new Error(`size ${MENUS.length}`);
+  if (MENUS.length < 60 || MENUS.length > 150) throw new Error(`size ${MENUS.length}`);
 });
 test("MENUS valid", () => {
   const tags = ["pork", "meat", "seafood", "nuts"];
@@ -343,6 +343,16 @@ test("MODES config", () => {
   eq(MODES.diet.pool({ light: false }), false);
   eq(MODES.diet.pool({}), false);
 });
+test("MENUS stage2 foreign dishes tagged", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  for (const id of ["pizza", "hamburger", "pasta", "burrito", "taco", "sandwich", "toast", "pad-thai", "tom-yum-goong", "poke", "salad", "sushi", "ramen", "steak", "curry-rice", "okonomiyaki", "donburi"]) {
+    const m = by(id);
+    if (/(ham|bacon|pepperoni|sausage|pork)/i.test(m.desc.en) && !(m.contains.includes("pork") && m.contains.includes("meat"))) throw new Error(id + " pork");
+  }
+  for (const id of ["poke", "sushi", "pad-thai", "tom-yum-goong"]) if (!by(id).contains.includes("seafood")) throw new Error(id + " seafood");
+  for (const id of ["pizza", "hamburger", "pasta", "burrito", "taco", "steak"]) if (!by(id).contains.includes("meat")) throw new Error(id + " meat");
+  if (!by("pad-thai").contains.includes("nuts")) throw new Error("pad-thai nuts");
+});
 test("MENUS ways valid", () => {
   for (const m of MENUS) {
     const ok = Array.isArray(m.ways) && m.ways.includes("dine") && new Set(m.ways).size === m.ways.length && m.ways.every(w => ["dine", "delivery", "home"].includes(w));
@@ -352,8 +362,8 @@ test("MENUS ways valid", () => {
 test("MENUS way counts", () => {
   const c = w => MENUS.filter(m => m.ways.includes(w)).length;
   eq(c("dine"), MENUS.length);
-  if (c("delivery") < 40) throw new Error("delivery " + c("delivery"));
-  if (c("home") < 25) throw new Error("home " + c("home"));
+  if (c("delivery") < 70) throw new Error("delivery " + c("delivery"));
+  if (c("home") < 55) throw new Error("home " + c("home"));
 });
 test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
