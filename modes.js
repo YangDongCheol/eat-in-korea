@@ -1,0 +1,2 @@
+// Mode config. First-screen card order is Object.keys(MODES). diet shows only menus flagged light (a "less oily or smaller" guess, not a calorie claim).
+const MODES = { meal: { labelKey: "modeMeal", descKey: "modeMealDesc", questions: ["way", "restrictions", "spice", "feel"], pool: (m) => true }, diet: { labelKey: "modeDiet", descKey: "modeDietDesc", questions: ["way", "restrictions", "spice"], pool: (m) => m.light === true } };

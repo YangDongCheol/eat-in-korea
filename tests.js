@@ -333,6 +333,47 @@ test("every spice level has menus", () => {
   }
 });
 
+// --- modes and menu flags ---
+test("MODES config", () => {
+  eq(Object.keys(MODES), ["meal", "diet"]);
+  eq(MODES.meal.questions, ["way", "restrictions", "spice", "feel"]);
+  eq(MODES.diet.questions, ["way", "restrictions", "spice"]);
+  eq([MODES.meal.labelKey, MODES.meal.descKey, MODES.diet.labelKey, MODES.diet.descKey], ["modeMeal", "modeMealDesc", "modeDiet", "modeDietDesc"]);
+  eq(MODES.meal.pool({}), true);
+  eq(MODES.diet.pool({ light: true }), true);
+  eq(MODES.diet.pool({ light: false }), false);
+  eq(MODES.diet.pool({}), false);
+});
+test("MENUS ways valid", () => {
+  for (const m of MENUS) {
+    const ok = Array.isArray(m.ways) && m.ways.includes("dine") && new Set(m.ways).size === m.ways.length && m.ways.every(w => ["dine", "delivery", "home"].includes(w));
+    if (!ok || typeof m.light !== "boolean") throw new Error(m.id);
+  }
+});
+test("MENUS way counts", () => {
+  const c = w => MENUS.filter(m => m.ways.includes(w)).length;
+  eq(c("dine"), MENUS.length);
+  if (c("delivery") < 40) throw new Error("delivery " + c("delivery"));
+  if (c("home") < 25) throw new Error("home " + c("home"));
+});
+test("MENUS single restriction per way", () => {
+  for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
+    const n = MENUS.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
+    const min = r === "vegetarian" ? (way === "dine" ? 8 : 5) : 10;
+    if (n < min) throw new Error(way + " " + r + ": " + n);
+  }
+});
+test("diet pool size", () => {
+  if (MENUS.filter(MODES.diet.pool).length < 15) throw new Error("pool too small");
+  for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
+    const n = MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: [r], spice: "hot", feel: "any", way: "dine" })).length;
+    if (n < (r === "vegetarian" ? 3 : 5)) throw new Error(r + ": " + n);
+  }
+});
+test("diet pool is plausible", () => {
+  for (const m of MENUS.filter(MODES.diet.pool)) if (["pork", "meat", "seafood", "nuts"].every(x => m.contains.includes(x))) throw new Error(m.id);
+});
+
 // --- report ---
 function report() {
   const failed = results.filter(r => !r.ok);
