@@ -1,6 +1,6 @@
 // UI: ask -> result -> staff card, plus history. Logic lives in logic.js, text in strings.js.
 const QUESTIONS = [
-  ["way", "qMode", false, [["dine", "modeDine", "🍴"], ["delivery", "modeDelivery", "🛵"]]],
+  ["way", "qWay", false, [["dine", "wayDine", "🍴"], ["delivery", "wayDelivery", "🛵"]]],
   ["restrictions", "qRestrict", true, [["pork", "optPork", "🐷"], ["vegetarian", "optVeg", "🥬"], ["seafood", "optSeafood", "🐟"], ["nuts", "optNuts", "🥜"]]],
   ["spice", "qSpice", false, [["none", "spiceNone", "🙂"], ["mild", "spiceMild", "🌶️"], ["hot", "spiceHot", "🔥"]]],
   ["feel", "qFeel", false, [["hearty", "feelHearty", "🍖"], ["light", "feelLight", "🥗"], ["any", "feelAny", "🎲"]]],
