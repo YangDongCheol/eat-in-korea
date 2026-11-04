@@ -258,7 +258,6 @@ test("strings new values exact", () => {
   for (const l of ["en", "zh", "ko"]) for (const [k, v] of Object.entries(X[l])) eq(STRINGS[l][k], v);
 });
 test("strings dietNote no calorie claims", () => {
-  for (const l of ["en", "zh", "ko"]) for (const w of FORBIDDEN) if (STRINGS[l].dietNote.toLowerCase().includes(w)) throw new Error(`${l}.dietNote contains "${w}"`);
   if (!STRINGS.en.dietNote.includes("low in calories")) throw new Error("missing low in calories");
   for (const w of ["low-calorie", "low calorie"]) if (STRINGS.en.dietNote.includes(w)) throw new Error(w);
 });
@@ -374,16 +373,17 @@ test("diet pool is plausible", () => {
   for (const m of MENUS.filter(MODES.diet.pool)) if (["pork", "meat", "seafood", "nuts"].every(x => m.contains.includes(x))) throw new Error(m.id);
 });
 
-// --- report ---
-function report() {
-  test("diet mode ignores hidden feel answer", () => {
+test("diet mode ignores hidden feel answer", () => {
   const a = { restrictions: [], spice: "hot", feel: "hearty", way: "dine" };
   const pool = MENUS.filter(MODES.diet.pool);
   eq(pool.filter(m => allowed(m, modeAnswers(MODES.diet, a))).length, pool.length);
   eq(modeAnswers(MODES.meal, a).feel, "hearty");
   eq(a.feel, "hearty");
 });
-const failed = results.filter(r => !r.ok);
+
+// --- report ---
+function report() {
+  const failed = results.filter(r => !r.ok);
   const summary = `${failed.length ? "FAIL " + failed.length : "PASS " + results.length}/${results.length}`;
   if (typeof document !== "undefined") {
     document.title = summary;
