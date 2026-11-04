@@ -367,6 +367,16 @@ test("MENUS batch B2 safety tags", () => {
   need(["jeyuk-deopbap", "moksal-gui", "hangjeongsal-gui", "galmaegisal", "makchang-gui", "daepae-samgyeopsal", "tteok-galbi"], ["pork", "meat"]);
   need(["bulgogi-deopbap", "ori-bulgogi", "hunje-ori", "chadol-bagi", "dak-kkochi", "sogogi-gukbap"], ["meat"]);
 });
+test("MENUS batch B3 safety tags", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
+  need(["gun-mandu", "mul-mandu", "donggeurangttaeng", "kkwabaro-u", "jjajang-bap", "gochu-japchae"], ["pork", "meat"]);
+  need(["jjamppong-bap", "bajirak-kalguksu", "eomuk", "twigim", "rose-tteokbokki", "pajeon"], ["seafood"]);
+  // anchovy/meat broths and kimchi: match janchi-guksu and kalguksu
+  need(["kimchi-mari-guksu", "kaljebi", "sujebi", "mak-guksu", "deulkkae-kalguksu"], ["meat", "seafood"]);
+  // convention: perilla/sesame are not tagged nuts (see kalguksu-style entries); kong-guksu names peanuts, so it is tagged
+  if (by("deulkkae-kalguksu").contains.includes("nuts")) throw new Error("perilla tagged nuts");
+});
 test("MENUS ways valid", () => {
   for (const m of MENUS) {
     const ok = Array.isArray(m.ways) && m.ways.includes("dine") && new Set(m.ways).size === m.ways.length && m.ways.every(w => ["dine", "delivery", "home"].includes(w));
