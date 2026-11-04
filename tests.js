@@ -362,8 +362,8 @@ test("MENUS ways valid", () => {
 test("MENUS way counts", () => {
   const c = w => MENUS.filter(m => m.ways.includes(w)).length;
   eq(c("dine"), MENUS.length);
-  if (c("delivery") < 70) throw new Error("delivery " + c("delivery"));
-  if (c("home") < 55) throw new Error("home " + c("home"));
+  if (c("delivery") < 89) throw new Error("delivery " + c("delivery"));
+  if (c("home") < 72) throw new Error("home " + c("home"));
 });
 test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
@@ -373,10 +373,18 @@ test("MENUS single restriction per way", () => {
   }
 });
 test("diet pool size", () => {
-  if (MENUS.filter(MODES.diet.pool).length < 15) throw new Error("pool too small");
+  if (MENUS.filter(MODES.diet.pool).length < 28) throw new Error("pool too small");
   for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
     const n = MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: [r], spice: "hot", feel: "any", way: "dine" })).length;
     if (n < (r === "vegetarian" ? 3 : 5)) throw new Error(r + ": " + n);
+  }
+});
+test("diet pool per way", () => {
+  for (const way of ["dine", "delivery", "home"]) {
+    const n = r => MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: r, spice: "hot", feel: "any", way })).length;
+    if (n([]) < 10) throw new Error(way + " none: " + n([]));
+    for (const r of ["pork", "seafood", "nuts"]) if (n([r]) < 6) throw new Error(way + " " + r + ": " + n([r]));
+    if (n(["vegetarian"]) < 4) throw new Error(way + " vegetarian: " + n(["vegetarian"]));
   }
 });
 test("diet pool is plausible", () => {

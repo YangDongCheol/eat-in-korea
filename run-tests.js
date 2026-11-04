@@ -23,6 +23,9 @@ test("sw install fetches with cache: reload", () => {
 test("sw cache name versioned", () => {
   eq(/const CACHE = "eik-v\d+"/.test(swSrc()), true);
 });
+test("sw cache is eik-v7", () => {
+  eq(/const CACHE = "eik-v7"/.test(swSrc()), true);
+});
 test("sw activate only deletes this app's old caches", () => {
   const listeners = {}, deleted = [];
   const cur = swSrc().match(/const CACHE = "(eik-v\d+)"/)[1];
