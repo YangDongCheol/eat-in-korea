@@ -383,6 +383,17 @@ test("MENUS batch B3 safety tags", () => {
   // convention: perilla/sesame are not tagged nuts (see kalguksu-style entries); kong-guksu names peanuts, so it is tagged
   if (by("deulkkae-kalguksu").contains.includes("nuts")) throw new Error("perilla tagged nuts");
 });
+test("MENUS batch B4 safety tags", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  const need = (ids, tags) => { for (const id of ids) for (const t of tags) if (!by(id).contains.includes(t)) throw new Error(id + " missing " + t); };
+  need(["gambas", "takoyaki", "nasi-goreng", "bun-cha", "banh-mi", "clam-chowder", "caesar-salad", "hoguo", "dimsum", "sukiyaki", "risotto", "fajita"], ["seafood"]);
+  need(["banh-mi", "bun-cha", "lasagna", "clam-chowder", "dimsum", "caesar-salad", "hoguo", "risotto", "omelet"], ["pork", "meat"]);
+  need(["karaage", "yakitori", "tandoori-chicken", "chicken-wings", "kebab", "fajita", "nasi-goreng", "sukiyaki", "quesadilla", "namul-jeongsik"], ["meat"]);
+  need(["hoguo", "falafel", "veggie-burger"], ["nuts"]);
+  // vegetarian-leaning dishes carry no meat or seafood tags
+  for (const id of ["falafel", "veggie-burger", "yeondubu", "yachae-juk"]) for (const t of ["pork", "meat", "seafood"]) if (by(id).contains.includes(t)) throw new Error(id + " has " + t);
+  for (const id of ["namul-jeongsik", "yeondubu", "yachae-juk"]) if (!by(id).light) throw new Error(id + " not light");
+});
 test("MENUS ways valid", () => {
   for (const m of MENUS) {
     const ok = Array.isArray(m.ways) && m.ways.includes("dine") && new Set(m.ways).size === m.ways.length && m.ways.every(w => ["dine", "delivery", "home"].includes(w));
@@ -392,18 +403,18 @@ test("MENUS ways valid", () => {
 test("MENUS way counts", () => {
   const c = w => MENUS.filter(m => m.ways.includes(w)).length;
   eq(c("dine"), MENUS.length);
-  if (c("delivery") < 90) throw new Error("delivery " + c("delivery"));
-  if (c("home") < 73) throw new Error("home " + c("home"));
+  if (c("delivery") < 164) throw new Error("delivery " + c("delivery"));
+  if (c("home") < 128) throw new Error("home " + c("home"));
 });
 test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
     const n = MENUS.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
-    const min = r === "vegetarian" ? (way === "dine" ? 8 : 5) : 10;
+    const min = r === "vegetarian" ? (way === "dine" ? 20 : 10) : 10;
     if (n < min) throw new Error(spice + " " + way + " " + r + ": " + n);
   }
 });
 test("diet pool size", () => {
-  if (MENUS.filter(MODES.diet.pool).length < 28) throw new Error("pool too small");
+  if (MENUS.filter(MODES.diet.pool).length < 39) throw new Error("pool too small");
   for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
     const n = MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: [r], spice: "hot", feel: "any", way: "dine" })).length;
     if (n < (r === "vegetarian" ? 3 : 5)) throw new Error(r + ": " + n);
@@ -414,7 +425,7 @@ test("diet pool per way", () => {
     const n = r => MENUS.filter(m => MODES.diet.pool(m) && allowed(m, { restrictions: r, spice, feel: "any", way })).length;
     if (n([]) < 10) throw new Error(spice + " " + way + " none: " + n([]));
     for (const r of ["pork", "seafood", "nuts"]) if (n([r]) < 6) throw new Error(way + " " + r + ": " + n([r]));
-    if (n(["vegetarian"]) < 4) throw new Error(spice + " " + way + " vegetarian: " + n(["vegetarian"]));
+    if (n(["vegetarian"]) < 5) throw new Error(spice + " " + way + " vegetarian: " + n(["vegetarian"]));
   }
 });
 test("diet pool is plausible", () => {
