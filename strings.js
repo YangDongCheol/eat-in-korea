@@ -1,6 +1,6 @@
 const STRINGS = {
   en: {
-    title: "Eat in Korea",
+    title: "오늘뭐먹지",
     subtitle: "Find a Korean dish that fits you",
     langEn: "English",
     langZh: "简体中文",
@@ -57,7 +57,7 @@ const STRINGS = {
     langKo: "한국어",
   },
   zh: {
-    title: "Eat in Korea",
+    title: "오늘뭐먹지",
     subtitle: "找到适合你的韩国美食",
     langEn: "English",
     langZh: "简体中文",
@@ -114,7 +114,7 @@ const STRINGS = {
     langKo: "한국어",
   },
   ko: {
-    title: "Eat in Korea",
+    title: "오늘뭐먹지",
     subtitle: "나에게 맞는 한국 음식을 찾아보세요",
     langEn: "English",
     langZh: "简体中文",

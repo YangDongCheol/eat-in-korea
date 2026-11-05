@@ -249,6 +249,9 @@ test("strings no guarantee claims", () => {
   for (const l of ["en", "zh", "ko"]) for (const [k, v] of Object.entries(STRINGS[l]))
     for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${l}.${k} contains "${w}"`);
 });
+test("app title is 오늘뭐먹지 in every language", () => {
+  for (const l of ["en", "zh", "ko"]) eq(STRINGS[l].title, "오늘뭐먹지");
+});
 test("strings new values exact", () => {
   const X = {
     en: { qWay: "How are you eating?", wayDine: "Dine out", wayDelivery: "Delivery", wayHome: "Cook at home", modeMeal: "Meal", modeDiet: "Diet", modeMealDesc: "Pick a dish that fits you", modeDietDesc: "Only lighter dishes", pickMode: "Choose a mode", recipe: "See a recipe", backToModes: "Back to modes", dietNote: "\"Light\" means a dish that is usually less oily or smaller, not that it is low in calories. Every restaurant is different." },

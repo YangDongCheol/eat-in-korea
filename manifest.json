@@ -1,6 +1,6 @@
 {
-  "name": "Eat in Korea",
-  "short_name": "EatKR",
+  "name": "오늘뭐먹지",
+  "short_name": "오늘뭐먹지",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
