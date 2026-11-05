@@ -213,7 +213,7 @@ test("sanitizeHistory caps at 100", () => {
 });
 
 // --- strings ---
-const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장", "다이어트에 좋", "다이어트 식품", "저칼로리", "칼로리가 낮은", "살 안 찌", "diet food", "low-calorie", "low calorie", "slimming", "fat-burning", "低卡", "减脂", "瘦身"];
+const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장", "다이어트에 좋", "다이어트 식품", "저칼로리", "칼로리가 낮은", "살 안 찌", "diet food", "low-calorie", "low calorie", "slimming", "fat-burning", "低卡", "减脂", "瘦身", "easy on the stomach", "gentle on the stomach", "容易消化", "소화가 잘"];
 const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote"];
 test("strings keys match", () => {
   const en = Object.keys(STRINGS.en).sort();
@@ -410,7 +410,7 @@ test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
     const n = MENUS.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
     const min = r === "vegetarian" ? (way === "dine" ? 20 : 10) : 10;
-    if (n < min) throw new Error(spice + " " + way + " " + r + ": " + n);
+    if (n < min) throw new Error(way + " " + r + ": " + n);
   }
 });
 test("diet pool size", () => {
