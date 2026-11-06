@@ -457,6 +457,33 @@ test("dessert mode ignores hidden feel and spice answers", () => {
   eq([d.feel, d.spice], ["any", "none"]);
 });
 
+test("dessert pool size", () => {
+  if (MENUS.filter(MODES.dessert.pool).length < 38) throw new Error("dessert pool " + MENUS.filter(MODES.dessert.pool).length);
+});
+test("dessert pool per way", () => {
+  for (const way of ["dine", "delivery", "home"]) {
+    const n = r => MENUS.filter(m => MODES.dessert.pool(m) && allowed(m, { restrictions: r, spice: "hot", feel: "any", way })).length;
+    if (n([]) < 10) throw new Error(way + " none: " + n([]));
+    if (n(["vegetarian"]) < 10) throw new Error(way + " vegetarian: " + n(["vegetarian"]));
+    if (n(["nuts"]) < 5) throw new Error(way + " nuts: " + n(["nuts"]));
+  }
+});
+test("desserts only in dessert mode", () => {
+  eq(MENUS.filter(MODES.meal.pool).filter(m => m.dessert === true).length, 0);
+  eq(MENUS.filter(MODES.dessert.pool).filter(m => m.dessert !== true).length, 0);
+  for (const m of MENUS.filter(MODES.dessert.pool)) {
+    if (m.id !== "tteok-kkochi" && m.spice !== 0) throw new Error(m.id + " spice");
+    const p = m.contains.includes("pork"), e = m.contains.includes("meat");
+    if (p !== e && p) throw new Error(m.id + " pork without meat");
+  }
+});
+test("MENUS dessert safety tags", () => {
+  const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
+  for (const id of ["macaron", "hodu-gwaja", "brownie", "cookie", "gunbam", "gelato", "gangjeong", "songpyeon"])
+    if (!by(id).contains.includes("nuts")) throw new Error(id + " needs nuts");
+  for (const id of ["gyeranppang"]) if (!by(id).contains.includes("pork")) throw new Error(id);
+});
+
 // --- report ---
 function report() {
   const failed = results.filter(r => !r.ok);

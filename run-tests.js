@@ -23,8 +23,8 @@ test("sw install fetches with cache: reload", () => {
 test("sw cache name versioned", () => {
   eq(/const CACHE = "eik-v\d+"/.test(swSrc()), true);
 });
-test("sw cache is eik-v9", () => {
-  eq(/const CACHE = "eik-v9"/.test(swSrc()), true);
+test("sw cache is eik-v10", () => {
+  eq(/const CACHE = "eik-v10"/.test(swSrc()), true);
 });
 test("app name is 오늘뭐먹지 in manifest and page title", () => {
   const m = JSON.parse(fs.readFileSync(path.join(__dirname, "manifest.json"), "utf8"));
