@@ -33,7 +33,8 @@ function pick(menus, answers, history, shown, now, rand = Math.random) {
 
 // A question a mode hides must not filter silently (answers are shared across modes).
 function modeAnswers(mode, a) {
-  return mode.questions.includes("feel") ? a : { ...a, feel: "any" };
+  const q = mode.questions;
+  return { ...a, ...(q.includes("feel") ? {} : { feel: "any" }), ...(q.includes("spice") ? {} : { spice: "hot" }) };
 }
 const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any", way: "dine" };
 const RESTRICTIONS = ["pork", "vegetarian", "seafood", "nuts"]; // also the notes order

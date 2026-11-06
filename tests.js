@@ -214,7 +214,7 @@ test("sanitizeHistory caps at 100", () => {
 
 // --- strings ---
 const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장", "다이어트에 좋", "다이어트 식품", "저칼로리", "칼로리가 낮은", "살 안 찌", "diet food", "low-calorie", "low calorie", "slimming", "fat-burning", "低卡", "减脂", "瘦身", "easy on the stomach", "gentle on the stomach", "容易消化", "소화가 잘"];
-const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote"];
+const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote", "modeDessert", "modeDessertDesc"];
 test("strings keys match", () => {
   const en = Object.keys(STRINGS.en).sort();
   eq(en, Object.keys(STRINGS.zh).sort());
@@ -254,9 +254,9 @@ test("app title is 오늘뭐먹지 in every language", () => {
 });
 test("strings new values exact", () => {
   const X = {
-    en: { qWay: "How are you eating?", wayDine: "Dine out", wayDelivery: "Delivery", wayHome: "Cook at home", modeMeal: "Meal", modeDiet: "Diet", modeMealDesc: "Pick a dish that fits you", modeDietDesc: "Only lighter dishes", pickMode: "Choose a mode", recipe: "See a recipe", backToModes: "Back to modes", dietNote: "\"Light\" means a dish that is usually less oily or smaller, not that it is low in calories. Every restaurant is different." },
-    zh: { qWay: "怎么吃？", wayDine: "去店里吃", wayDelivery: "点外卖", wayHome: "在家做", modeMeal: "正餐", modeDiet: "轻食", modeMealDesc: "挑一道适合你的菜", modeDietDesc: "只推荐比较清淡的菜", pickMode: "选择模式", recipe: "看食谱", backToModes: "返回模式选择", dietNote: "“清淡”指这道菜通常油少或分量小，不代表热量低。每家餐厅做法不同。" },
-    ko: { qWay: "어떻게 드실래요?", wayDine: "식당에서", wayDelivery: "배달", wayHome: "집밥", modeMeal: "식사", modeDiet: "다이어트", modeMealDesc: "나에게 맞는 메뉴를 골라줘요", modeDietDesc: "부담 적은 메뉴만 골라줘요", pickMode: "모드를 골라 주세요", recipe: "레시피 보기", backToModes: "모드 선택으로", dietNote: "\"부담 적은 메뉴\"는 보통 기름기나 양이 적은 편이라는 뜻이고, 칼로리가 낮다는 뜻은 아니에요. 식당마다 달라요." },
+    en: { qWay: "How are you eating?", wayDine: "Dine out", wayDelivery: "Delivery", wayHome: "Cook at home", modeMeal: "Meal", modeDiet: "Diet", modeMealDesc: "Pick a dish that fits you", modeDietDesc: "Only lighter dishes", pickMode: "Choose a mode", recipe: "See a recipe", backToModes: "Back to modes", dietNote: "\"Light\" means a dish that is usually less oily or smaller, not that it is low in calories. Every restaurant is different.", modeDessert: "Dessert", modeDessertDesc: "Something sweet" },
+    zh: { qWay: "怎么吃？", wayDine: "去店里吃", wayDelivery: "点外卖", wayHome: "在家做", modeMeal: "正餐", modeDiet: "轻食", modeMealDesc: "挑一道适合你的菜", modeDietDesc: "只推荐比较清淡的菜", pickMode: "选择模式", recipe: "看食谱", backToModes: "返回模式选择", dietNote: "“清淡”指这道菜通常油少或分量小，不代表热量低。每家餐厅做法不同。", modeDessert: "甜点", modeDessertDesc: "来点甜的" },
+    ko: { qWay: "어떻게 드실래요?", wayDine: "식당에서", wayDelivery: "배달", wayHome: "집밥", modeMeal: "식사", modeDiet: "다이어트", modeMealDesc: "나에게 맞는 메뉴를 골라줘요", modeDietDesc: "부담 적은 메뉴만 골라줘요", pickMode: "모드를 골라 주세요", recipe: "레시피 보기", backToModes: "모드 선택으로", dietNote: "\"부담 적은 메뉴\"는 보통 기름기나 양이 적은 편이라는 뜻이고, 칼로리가 낮다는 뜻은 아니에요. 식당마다 달라요.", modeDessert: "디저트", modeDessertDesc: "달콤한 걸 골라줘요" },
   };
   for (const l of ["en", "zh", "ko"]) for (const [k, v] of Object.entries(X[l])) eq(STRINGS[l][k], v);
 });
@@ -337,7 +337,11 @@ test("every spice level has menus", () => {
 
 // --- modes and menu flags ---
 test("MODES config", () => {
-  eq(Object.keys(MODES), ["meal", "diet"]);
+  eq(Object.keys(MODES), ["meal", "diet", "dessert"]);
+  eq(MODES.dessert.questions, ["way", "restrictions"]);
+  eq([MODES.dessert.labelKey, MODES.dessert.descKey], ["modeDessert", "modeDessertDesc"]);
+  eq([MODES.meal.pool({ dessert: true }), MODES.meal.pool({}), MODES.meal.pool({ dessert: false })], [false, true, true]);
+  eq([MODES.dessert.pool({ dessert: true }), MODES.dessert.pool({}), MODES.dessert.pool({ dessert: false })], [true, false, false]);
   eq(MODES.meal.questions, ["way", "restrictions", "spice", "feel"]);
   eq(MODES.diet.questions, ["way", "restrictions", "spice"]);
   eq([MODES.meal.labelKey, MODES.meal.descKey, MODES.diet.labelKey, MODES.diet.descKey], ["modeMeal", "modeMealDesc", "modeDiet", "modeDietDesc"]);
@@ -442,6 +446,15 @@ test("diet mode ignores hidden feel answer", () => {
   eq(pool.filter(m => allowed(m, modeAnswers(MODES.diet, a))).length, pool.length);
   eq(modeAnswers(MODES.meal, a).feel, "hearty");
   eq(a.feel, "hearty");
+});
+test("dessert mode ignores hidden feel and spice answers", () => {
+  const a = { restrictions: [], spice: "none", feel: "hearty", way: "dine" };
+  const r = modeAnswers(MODES.dessert, a);
+  eq([r.spice, r.feel], ["hot", "any"]);
+  eq([a.spice, a.feel], ["none", "hearty"]);
+  eq(modeAnswers(MODES.meal, a), a);
+  const d = modeAnswers(MODES.diet, a);
+  eq([d.feel, d.spice], ["any", "none"]);
 });
 
 // --- report ---
