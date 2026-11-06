@@ -299,7 +299,8 @@ test("MENUS no guarantee claims", () => {
   for (const m of MENUS) for (const v of [m.ko, m.name.en, m.name.zh, m.desc.en, m.desc.zh, m.desc.ko])
     for (const w of FORBIDDEN) if (v.toLowerCase().includes(w)) throw new Error(`${m.id} contains "${w}"`);
 });
-const allowedCount = (restrictions, spice) => MENUS.filter(m => allowed(m, A(restrictions, spice, "any"))).length;
+const MEAL = MENUS.filter(MODES.meal.pool);
+const allowedCount = (restrictions, spice) => MEAL.filter(m => allowed(m, A(restrictions, spice, "any"))).length;
 test("single restriction leaves enough", () => {
   for (const r of ["pork", "seafood", "nuts"]) if (allowedCount([r], "hot") < 20) throw new Error(`${r}: ${allowedCount([r], "hot")}`);
   if (allowedCount(["vegetarian"], "hot") < 8) throw new Error(`vegetarian: ${allowedCount(["vegetarian"], "hot")}`);
@@ -321,7 +322,7 @@ test("MENUS ko nut keywords imply nuts tag", () => {
     throw new Error(`${m.id} desc.ko mentions nuts but has no nuts tag`);
 });
 test("vegetarian hearty has menus", () => {
-  const n = MENUS.filter(m => allowed(m, A(["vegetarian"], "hot", "hearty"))).length;
+  const n = MEAL.filter(m => allowed(m, A(["vegetarian"], "hot", "hearty"))).length;
   if (n < 2) throw new Error(`only ${n}`);
 });
 test("all four restrictions still has menus", () => {
@@ -330,7 +331,7 @@ test("all four restrictions still has menus", () => {
 });
 test("every spice level has menus", () => {
   for (const s of [0, 1, 2, 3]) {
-    const n = MENUS.filter(m => m.spice === s).length;
+    const n = MEAL.filter(m => m.spice === s).length;
     if (n < 5) throw new Error(`spice ${s}: ${n}`);
   }
 });
@@ -408,14 +409,14 @@ test("MENUS ways valid", () => {
   }
 });
 test("MENUS way counts", () => {
-  const c = w => MENUS.filter(m => m.ways.includes(w)).length;
-  eq(c("dine"), MENUS.length);
+  const c = w => MEAL.filter(m => m.ways.includes(w)).length;
+  eq(c("dine"), MEAL.length);
   if (c("delivery") < 164) throw new Error("delivery " + c("delivery"));
   if (c("home") < 128) throw new Error("home " + c("home"));
 });
 test("MENUS single restriction per way", () => {
   for (const way of ["dine", "delivery", "home"]) for (const r of ["pork", "vegetarian", "seafood", "nuts"]) {
-    const n = MENUS.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
+    const n = MEAL.filter(m => allowed(m, { restrictions: [r], spice: "hot", feel: "any", way })).length;
     const min = r === "vegetarian" ? (way === "dine" ? 20 : 10) : 10;
     if (n < min) throw new Error(way + " " + r + ": " + n);
   }
