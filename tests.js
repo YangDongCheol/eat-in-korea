@@ -477,9 +477,15 @@ test("desserts only in dessert mode", () => {
     if (p !== e && p) throw new Error(m.id + " pork without meat");
   }
 });
+test("dessert mode keeps mild-spice desserts despite saved spice none", () => {
+  const k = MENUS.find(m => m.id === "tteok-kkochi");
+  const a = { restrictions: [], spice: "none", feel: "hearty", way: "dine" };
+  eq(allowed(k, modeAnswers(MODES.dessert, a)), true);
+  eq(allowed(k, modeAnswers(MODES.meal, a)), false);
+});
 test("MENUS dessert safety tags", () => {
   const by = id => MENUS.find(m => m.id === id) || (() => { throw new Error("missing " + id); })();
-  for (const id of ["macaron", "hodu-gwaja", "brownie", "cookie", "gunbam", "gelato", "gangjeong", "songpyeon"])
+  for (const id of ["macaron", "hodu-gwaja", "brownie", "cookie", "gunbam", "donut", "gelato", "gangjeong", "songpyeon"])
     if (!by(id).contains.includes("nuts")) throw new Error(id + " needs nuts");
   for (const id of ["gyeranppang"]) if (!by(id).contains.includes("pork")) throw new Error(id);
 });
