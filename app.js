@@ -240,6 +240,7 @@ $("go").onclick = () => {
   saveJSON(store, "eik:lastAnswers", answers);
   saveJSON(store, "eik:lastMode", currentMode);
   canQuick = true;
+  $("home-quick").hidden = false; // first-ever pick: show it without waiting for a re-render
   shown = [];
   showPick();
 };
