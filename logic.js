@@ -15,8 +15,10 @@ function allowed(menu, a) {
 }
 
 // Returns { menu, cycled }. cycled: every allowed menu was already shown this session — caller resets shown to [menu.id].
-function pick(menus, answers, history, shown, now, rand = Math.random) {
-  const matched = menus.filter(m => allowed(m, answers));
+// blocked: ids the user never wants; ignored only when they are all that is left (never dead-end).
+function pick(menus, answers, history, shown, now, rand = Math.random, blocked = []) {
+  const fits = menus.filter(m => allowed(m, answers));
+  const matched = fits.some(m => !blocked.includes(m.id)) ? fits.filter(m => !blocked.includes(m.id)) : fits;
   if (!matched.length) return { menu: null, cycled: false };
   let pool = matched.filter(m => !shown.includes(m.id));
   const cycled = !pool.length;
@@ -45,6 +47,7 @@ const NOTES = {
   nuts: "저는 견과류와 땅콩을 먹을 수 없어요. 들어가나요?",
 };
 const HISTORY_MAX = 100;
+const MARKS_MAX = 300;
 
 function staffCard(menu, restrictions) {
   return { dish: menu.ko, order: "이거 1인분 주세요.", notes: RESTRICTIONS.filter(r => restrictions.includes(r)).map(r => NOTES[r]) };
@@ -93,6 +96,18 @@ function sanitizeHistory(raw, validIds) {
     .filter(e => e && validIds.includes(e.id) && Number.isFinite(e.at))
     .slice(0, HISTORY_MAX)
     .map(e => ({ id: e.id, at: e.at }));
+}
+
+function sanitizeIds(raw, validIds) {
+  if (!Array.isArray(raw)) return [];
+  return [...new Set(raw.filter(id => validIds.includes(id)))].slice(0, MARKS_MAX);
+}
+
+// marks = { fav: [ids], block: [ids] }. Toggles id in `kind`; a menu is never in both lists.
+function setMark(marks, id, kind) {
+  const next = { fav: marks.fav.filter(x => x !== id), block: marks.block.filter(x => x !== id) };
+  if (!marks[kind].includes(id)) next[kind] = [id, ...next[kind]].slice(0, MARKS_MAX);
+  return next;
 }
 
 const DELIVERY_APPS = [

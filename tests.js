@@ -212,6 +212,36 @@ test("sanitizeHistory caps at 100", () => {
   eq(sanitizeHistory(raw, ID).length, 100);
 });
 
+// --- favorites / blocked ---
+const ANY = A([], "hot", "any");
+test("pick skips blocked menus", () => {
+  const got = new Set([0, 1, 2, 3, 4, 5].map(k => pick(M, ANY, [], [], T, () => k / 6, ["kimchi", "veg", "galbitang"]).menu.id));
+  eq([...got].sort(), ["noodle", "shrimp", "tteok"]);
+});
+test("pick ignores blocked when nothing else is allowed", () => {
+  const r = pick(M, A(["vegetarian"], "none", "light"), [], [], T, () => 0, ["veg", "noodle"]);
+  eq(r.menu !== null, true);
+});
+test("pick without blocked arg is unchanged", () => {
+  eq(pick(M, ANY, [], [], T, () => 0).menu.id, "kimchi");
+});
+test("sanitizeIds keeps valid unique ids only", () => {
+  eq(sanitizeIds(["b", "zzz", "a", "b", 5, null], ID), ["b", "a"]);
+  for (const raw of [{}, null, "x"]) eq(sanitizeIds(raw, ID), []);
+});
+test("sanitizeIds caps at 300", () => {
+  const ids300 = Array.from({ length: 400 }, (_, i) => "m" + i);
+  eq(sanitizeIds(ids300, ids300).length, 300);
+});
+test("setMark toggles and keeps lists exclusive", () => {
+  let s = { fav: [], block: [] };
+  s = setMark(s, "a", "fav"); eq(s, { fav: ["a"], block: [] });
+  s = setMark(s, "a", "block"); eq(s, { fav: [], block: ["a"] });
+  s = setMark(s, "b", "fav"); eq(s, { fav: ["b"], block: ["a"] });
+  s = setMark(s, "a", "block"); eq(s, { fav: ["b"], block: [] });
+  s = setMark(s, "b", "fav"); eq(s, { fav: [], block: [] });
+});
+
 // --- strings ---
 const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장", "다이어트에 좋", "다이어트 식품", "저칼로리", "칼로리가 낮은", "살 안 찌", "diet food", "low-calorie", "low calorie", "slimming", "fat-burning", "低卡", "减脂", "瘦身", "easy on the stomach", "gentle on the stomach", "容易消化", "소화가 잘"];
 const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote", "modeDessert", "modeDessertDesc"];
