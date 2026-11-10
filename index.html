@@ -22,6 +22,7 @@
     <p class="sub" data-s="pickMode"></p>
     <div id="modes"></div>
     <button id="home-history" class="link" data-s="historyLink"></button>
+    <button id="home-favs" class="link" data-s="favLink"></button>
   </section>
 
   <section id="ask" hidden>
@@ -42,6 +43,10 @@
       <p class="contains" data-s="contains"></p>
       <ul class="tags" id="menu-tags"></ul>
       <p class="desc" id="menu-desc"></p>
+      <div class="marks">
+        <button type="button" id="mark-fav" aria-pressed="false" data-s="markFav"></button>
+        <button type="button" id="mark-block" aria-pressed="false" data-s="markBlock"></button>
+      </div>
     </div>
     <div id="no-match" class="menu" hidden>
       <div class="emoji" aria-hidden="true">🤔</div>
@@ -72,6 +77,16 @@
     <ul id="history-list"></ul>
     <p id="history-empty" data-s="noHistory"></p>
     <button id="history-back" class="link" data-s="back"></button>
+  </section>
+  <section id="favs" hidden>
+    <h1 id="favs-title" tabindex="-1" data-s="favTitle"></h1>
+    <h2 data-s="favHeading"></h2>
+    <ul id="fav-list" class="mark-list"></ul>
+    <p id="fav-empty" data-s="noFav"></p>
+    <h2 data-s="blockedHeading"></h2>
+    <ul id="block-list" class="mark-list"></ul>
+    <p id="block-empty" data-s="noBlocked"></p>
+    <button id="favs-back" class="link" data-s="back"></button>
   </section>
 </main>
 <script src="strings.js"></script>

@@ -14,7 +14,9 @@ try { store = window.localStorage; } catch {} // access itself can throw in priv
 const savedLang = loadJSON(store, "eik:lang", null);
 let lang = ["en", "zh", "ko"].includes(savedLang) ? savedLang : detectLang(navigator.language);
 const answers = sanitizeAnswers(loadJSON(store, "eik:lastAnswers", null));
-let history = sanitizeHistory(loadJSON(store, "eik:history", []), MENUS.map(m => m.id));
+const VALID_IDS = MENUS.map(m => m.id);
+let history = sanitizeHistory(loadJSON(store, "eik:history", []), VALID_IDS);
+let marks = { fav: sanitizeIds(loadJSON(store, "eik:favorites", []), VALID_IDS), block: sanitizeIds(loadJSON(store, "eik:blocked", []), VALID_IDS) };
 let currentMode = "meal";
 let shown = [];
 let current = null;
@@ -88,6 +90,8 @@ function renderResult() {
     return li;
   }));
   $("menu-desc").textContent = m.desc[lang];
+  $("mark-fav").setAttribute("aria-pressed", String(marks.fav.includes(m.id)));
+  $("mark-block").setAttribute("aria-pressed", String(marks.block.includes(m.id)));
 }
 
 const menuName = (m) => lang === "ko" ? m.ko : m.name[lang];
@@ -141,6 +145,32 @@ function renderHistory() {
   $("history-empty").hidden = history.length > 0;
 }
 
+function renderMarks() {
+  const t = STRINGS[lang];
+  const byId = Object.fromEntries(MENUS.map(m => [m.id, m]));
+  for (const [kind, listId, emptyId] of [["fav", "fav-list", "fav-empty"], ["block", "block-list", "block-empty"]]) {
+    $(listId).replaceChildren(...marks[kind].map(id => {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = menuName(byId[id]);
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "✕";
+      del.setAttribute("aria-label", t.remove);
+      del.onclick = () => { marks = setMark(marks, id, kind); saveMarks(); renderMarks(); renderResult(); };
+      li.append(name, del);
+      return li;
+    }));
+    $(emptyId).hidden = marks[kind].length > 0;
+  }
+}
+
+function saveMarks() {
+  saveJSON(store, "eik:favorites", marks.fav);
+  saveJSON(store, "eik:blocked", marks.block);
+}
+
 // Re-renders everything for the current language without re-picking.
 function renderAll() {
   const t = STRINGS[lang];
@@ -154,10 +184,11 @@ function renderAll() {
   for (const b of document.querySelectorAll("[data-lang]")) b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
   renderResult();
   renderHistory();
+  renderMarks();
 }
 
 function showPick() {
-  const { menu, cycled } = pick(MENUS.filter(MODES[currentMode].pool), modeAnswers(MODES[currentMode], answers), history, shown, Date.now());
+  const { menu, cycled } = pick(MENUS.filter(MODES[currentMode].pool), modeAnswers(MODES[currentMode], answers), history, shown, Date.now(), Math.random, marks.block);
   current = menu;
   recorded = false;
   hint = null;
@@ -199,6 +230,11 @@ for (const [id, app] of [["delivery-coupang", DELIVERY_APPS[0]], ["delivery-baem
   };
 }
 $("staff-back").onclick = () => show("result", "menu-name");
+for (const [id, kind] of [["mark-fav", "fav"], ["mark-block", "block"]]) {
+  $(id).onclick = () => { marks = setMark(marks, current.id, kind); saveMarks(); renderResult(); renderMarks(); };
+}
+$("home-favs").onclick = () => show("favs", "favs-title");
+$("favs-back").onclick = () => show("home", "home-title");
 $("home-history").onclick = () => show("history", "history-title");
 $("history-back").onclick = () => show("home", "home-title");
 for (const b of document.querySelectorAll("[data-lang]")) {

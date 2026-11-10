@@ -74,15 +74,15 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .pop .emoji { animation: none; } }
 .menu h2 { font-size: 2.3rem; margin: 20px 0 0; overflow-wrap: anywhere; }
 
-#history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-#history-list li {
+#history-list, .mark-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+#history-list li, .mark-list li {
   display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 16px;
   background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; box-shadow: var(--shadow);
 }
-#history-list .name { flex: 1; font-weight: 700; overflow-wrap: anywhere; }
+#history-list .name, .mark-list .name { flex: 1; font-weight: 700; overflow-wrap: anywhere; }
 #history-list time { color: var(--muted); font-size: .9rem; }
-#history-list button { min-width: 44px; min-height: 44px; border: 0; background: none; color: var(--muted); font-size: 1.1rem; }
-#history-empty { color: var(--muted); }
+#history-list button, .mark-list button { min-width: 44px; min-height: 44px; border: 0; background: none; color: var(--muted); font-size: 1.1rem; }
+#history-empty, #fav-empty, #block-empty { color: var(--muted); }
 
 /* eat-in-korea additions */
 .langs { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 8px; }
@@ -122,3 +122,12 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .mode-desc { font-size: .95rem; color: var(--muted); }
 .diet-note { border-color: var(--accent); background: var(--accent-soft); color: var(--fg); font-weight: 600; }
 #ask > button.link { align-self: flex-start; }
+
+/* favorites / blocked */
+.marks { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+.marks button {
+  min-height: 44px; padding: 0 16px; font-size: 1rem; border-radius: 999px;
+  border: 2px solid var(--card-border); background: var(--card); color: var(--fg);
+}
+.marks button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+#favs h2 { font-size: 1.2rem; margin: 20px 0 8px; }
