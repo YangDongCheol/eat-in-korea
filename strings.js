@@ -1,5 +1,9 @@
 const STRINGS = {
   en: {
+    quickPick: "⚡ Quick pick with last choices",
+    noMatchHangoverVeg: "Hangover soups are nearly always made with a meat or fish broth, so none fit a vegetarian choice. Try another mode, or turn vegetarian off.",
+    unblockAll: "Unblock all",
+    unblockAllConfirm: "Tap again to unblock all",
     title: "오늘뭐먹지",
     subtitle: "Find a Korean dish that fits you",
     langEn: "English",
@@ -71,6 +75,10 @@ const STRINGS = {
     langKo: "한국어",
   },
   zh: {
+    quickPick: "⚡ 按上次的条件直接抽",
+    noMatchHangoverVeg: "这个模式里的汤类菜几乎都用肉类或鱼类高汤，所以没有符合素食的菜。可以换个模式，或取消素食选项。",
+    unblockAll: "全部取消屏蔽",
+    unblockAllConfirm: "再点一次确认全部取消",
     title: "오늘뭐먹지",
     subtitle: "找到适合你的韩国美食",
     langEn: "English",
@@ -142,6 +150,10 @@ const STRINGS = {
     langKo: "한국어",
   },
   ko: {
+    quickPick: "⚡ 지난 조건으로 바로 뽑기",
+    noMatchHangoverVeg: "해장 메뉴는 대부분 고기나 생선 육수를 써서 채식에 맞는 메뉴가 없어요. 다른 모드를 고르거나 채식 선택을 꺼 보세요.",
+    unblockAll: "전체 해제",
+    unblockAllConfirm: "한 번 더 누르면 전체 해제돼요",
     title: "오늘뭐먹지",
     subtitle: "나에게 맞는 한국 음식을 찾아보세요",
     langEn: "English",

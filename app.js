@@ -18,6 +18,9 @@ const VALID_IDS = MENUS.map(m => m.id);
 let history = sanitizeHistory(loadJSON(store, "eik:history", []), VALID_IDS);
 let marks = { fav: sanitizeIds(loadJSON(store, "eik:favorites", []), VALID_IDS), block: sanitizeIds(loadJSON(store, "eik:blocked", []), VALID_IDS) };
 let currentMode = "meal";
+let canQuick = loadJSON(store, "eik:lastAnswers", null) != null; // raw check: sanitizeAnswers always returns defaults
+let spinTimer = null;
+let unblockArmed = null; // timeout id while "tap again" is showing
 let shown = [];
 let current = null;
 let recorded = false;
@@ -74,6 +77,7 @@ function renderResult() {
   $("delivery-coupang").hidden = $("delivery-baemin").hidden = !m || way !== "delivery";
   $("diet-note").hidden = !m || currentMode !== "diet";
   renderHint();
+  $("no-match-hint").textContent = t[emptyReason(currentMode, answers) || "noMatchHint"];
   if (!m) return;
   $("menu-emoji").textContent = m.emoji;
   $("menu-name").textContent = menuName(m);
@@ -164,6 +168,10 @@ function renderMarks() {
     }));
     $(emptyId).hidden = marks[kind].length > 0;
   }
+  const ub = $("unblock-all");
+  ub.hidden = !marks.block.length;
+  ub.toggleAttribute("data-confirm", unblockArmed != null);
+  ub.textContent = t[unblockArmed != null ? "unblockAllConfirm" : "unblockAll"];
 }
 
 function saveMarks() {
@@ -182,6 +190,7 @@ function renderAll() {
     b.setAttribute("aria-label", t[sKey]);
   }
   for (const b of document.querySelectorAll("[data-lang]")) b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+  $("home-quick").hidden = !canQuick;
   renderResult();
   renderHistory();
   renderMarks();
@@ -193,11 +202,29 @@ function showPick() {
   recorded = false;
   hint = null;
   if (menu) shown = cycled ? [menu.id] : [...shown, menu.id];
+  clearInterval(spinTimer);
+  const reveal = () => {
+    $("result").classList.remove("spinning");
+    renderResult();
+    $("menu").classList.remove("pop");
+    void $("menu").offsetWidth; // restart the CSS animation on every pick
+    $("menu").classList.add("pop");
+    $(menu ? "menu-name" : "no-match-title").focus();
+  };
   renderResult();
-  show("result", menu ? "menu-name" : "no-match-title");
-  $("menu").classList.remove("pop");
-  void $("menu").offsetWidth; // restart the CSS animation on every pick
-  $("menu").classList.add("pop");
+  show("result");
+  let reduced = false;
+  try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch {}
+  if (!menu || reduced) return reveal();
+  // Roulette: the pick is already made above; this only animates toward it.
+  const frames = spinFrames(MENUS.map(m => m.emoji), menu.emoji, 11);
+  let i = 0;
+  $("result").classList.add("spinning");
+  $("menu-emoji").textContent = frames[0];
+  spinTimer = setInterval(() => {
+    $("menu-emoji").textContent = frames[++i];
+    if (i === frames.length - 1) { clearInterval(spinTimer); reveal(); }
+  }, 90);
 }
 
 // Only the first use per recommendation is recorded.
@@ -211,10 +238,29 @@ function record() {
 
 $("go").onclick = () => {
   saveJSON(store, "eik:lastAnswers", answers);
+  saveJSON(store, "eik:lastMode", currentMode);
+  canQuick = true;
   shown = [];
   showPick();
 };
 $("another").onclick = showPick;
+$("home-quick").onclick = () => {
+  currentMode = sanitizeMode(loadJSON(store, "eik:lastMode", null)) || "meal"; // saved answers from before modes existed: meal
+  shown = []; hint = null;
+  buildQuestions(); // keeps ask/back screens consistent with the mode
+  renderAll();
+  showPick();
+};
+$("unblock-all").onclick = () => {
+  if (unblockArmed == null) { // first tap only arms; it disarms itself after 4s
+    unblockArmed = setTimeout(() => { unblockArmed = null; renderMarks(); }, 4000);
+    return renderMarks();
+  }
+  clearTimeout(unblockArmed);
+  unblockArmed = null;
+  marks = clearBlocked(marks); saveMarks(); renderMarks(); renderResult();
+  $("favs-title").focus();
+};
 $("back").onclick = () => { hint = null; renderHint(); show("ask", "ask-title"); };
 $("ask-back").onclick = () => show("home", "home-title");
 $("recipe-btn").onclick = () => { record(); window.open(recipeUrl(current, lang), "_blank", "noopener"); };

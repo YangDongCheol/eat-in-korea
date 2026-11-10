@@ -244,7 +244,7 @@ test("setMark toggles and keeps lists exclusive", () => {
 
 // --- strings ---
 const FORBIDDEN = ["halal", "할랄", "清真", "safe", "안전", "安全", "guarantee", "保证", "allergen-free", "no allergens", "无过敏原", "过敏原", "알레르기 걱정 없", "알레르기 없", "알레르기 안심", "무알레르기", "보장", "다이어트에 좋", "다이어트 식품", "저칼로리", "칼로리가 낮은", "살 안 찌", "diet food", "low-calorie", "low calorie", "slimming", "fat-burning", "低卡", "减脂", "瘦身", "easy on the stomach", "gentle on the stomach", "容易消化", "소화가 잘"];
-const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "markFav", "markBlock", "favLink", "favTitle", "favHeading", "blockedHeading", "noFav", "noBlocked", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote", "modeDessert", "modeDessertDesc", "modeLate", "modeLateDesc", "modeHangover", "modeHangoverDesc"];
+const STRING_KEYS = ["title", "subtitle", "langEn", "langZh", "qRestrict", "optPork", "optVeg", "optSeafood", "optNuts", "qSpice", "spiceNone", "spiceMild", "spiceHot", "qFeel", "feelHearty", "feelLight", "feelAny", "go", "historyLink", "historyTitle", "markFav", "markBlock", "favLink", "favTitle", "favHeading", "blockedHeading", "noFav", "noBlocked", "noHistory", "back", "another", "showStaff", "findNearby", "pickedTag", "contains", "tagPork", "tagMeat", "tagSeafood", "tagNuts", "tagNone", "disclaimer", "noMatch", "noMatchHint", "staffBack", "remove", "spiceLabel", "qWay", "wayDine", "wayDelivery", "deliveryCoupang", "deliveryBaemin", "deliveryHint", "deliveryCopyFailed", "langKo", "wayHome", "modeMeal", "modeDiet", "modeMealDesc", "modeDietDesc", "pickMode", "recipe", "backToModes", "dietNote", "modeDessert", "modeDessertDesc", "modeLate", "modeLateDesc", "modeHangover", "modeHangoverDesc", "quickPick", "noMatchHangoverVeg", "unblockAll", "unblockAllConfirm"];
 test("strings keys match", () => {
   const en = Object.keys(STRINGS.en).sort();
   eq(en, Object.keys(STRINGS.zh).sort());
@@ -324,6 +324,12 @@ test("MENUS valid", () => {
 test("MENUS zh has chinese", () => {
   for (const m of MENUS) for (const v of [m.name.zh, m.desc.zh])
     if (!/[一-鿿]/.test(v)) throw new Error(`${m.id} zh has no hanzi`);
+});
+test("MENUS descriptions make no hangover-effect claims", () => {
+  for (const m of MENUS) {
+    if (/解酒|醒酒/.test(m.desc.zh)) throw new Error(m.id + " zh");
+    if (/(cure|cures|relief|relieve|relieves|remedy|soothe|soothes)/i.test(m.desc.en)) throw new Error(m.id + " en");
+  }
 });
 test("MENUS no guarantee claims", () => {
   for (const m of MENUS) for (const v of [m.ko, m.name.en, m.name.zh, m.desc.en, m.desc.zh, m.desc.ko])
@@ -563,4 +569,33 @@ test("late/hangover single restriction leaves enough (except vegetarian hangover
     const n = MENUS.filter(m => MODES[k].pool(m) && allowed(m, { restrictions: [r], spice: "hot", feel: "any", way: "dine" })).length;
     if (n < (k === "hangover" && r === "seafood" ? 4 : 8)) throw new Error(`${k}/${r}: ${n}`);
   }
+});
+
+// --- quick pick / roulette / empty reasons / unblock all ---
+test("sanitizeMode keeps known modes only", () => {
+  eq(sanitizeMode("late"), "late");
+  for (const bad of [null, undefined, "", "x", 3, {}, "toString", "__proto__"]) eq(sanitizeMode(bad), null);
+});
+test("emptyReason explains only vegetarian hangover", () => {
+  eq(emptyReason("hangover", { restrictions: ["vegetarian"] }), "noMatchHangoverVeg");
+  eq(emptyReason("hangover", { restrictions: ["pork"] }), null);
+  eq(emptyReason("late", { restrictions: ["vegetarian"] }), null);
+  eq(emptyReason("meal", { restrictions: ["vegetarian"] }), null);
+});
+test("vegetarian hangover really is empty and has a reason string in every language", () => {
+  const a = { restrictions: ["vegetarian"], spice: "hot", feel: "any", way: "dine" };
+  for (const way of ["dine", "delivery", "home"]) eq(pick(MENUS.filter(MODES.hangover.pool), { ...a, way }, [], [], T).menu, null);
+  for (const l of ["en", "zh", "ko"]) if (!STRINGS[l].noMatchHangoverVeg) throw new Error(l);
+});
+test("spinFrames: fixed length, always ends on the picked emoji", () => {
+  for (const r of RANDS) {
+    const f = spinFrames(["a", "b", "c"], "Z", 8, r);
+    eq(f.length, 8);
+    eq(f[7], "Z");
+    for (const x of f.slice(0, 7)) if (!["a", "b", "c"].includes(x)) throw new Error(x);
+  }
+  eq(spinFrames(["a"], "Z", 1, () => 0), ["Z"]);
+});
+test("clearBlocked empties block, keeps favorites", () => {
+  eq(clearBlocked({ fav: ["a"], block: ["b", "c"] }), { fav: ["a"], block: [] });
 });

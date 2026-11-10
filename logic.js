@@ -38,6 +38,18 @@ function modeAnswers(mode, a) {
   const q = mode.questions;
   return { ...a, ...(q.includes("feel") ? {} : { feel: "any" }), ...(q.includes("spice") ? {} : { spice: "hot" }) };
 }
+const sanitizeMode = (raw) => typeof raw === "string" && Object.hasOwn(MODES, raw) ? raw : null;
+
+// String key explaining an empty result, or null for the generic hint. Vegetarian hangover is empty by design (every hangover soup uses a meat or fish broth).
+const emptyReason = (mode, a) => mode === "hangover" && a.restrictions.includes("vegetarian") ? "noMatchHangoverVeg" : null;
+
+// Roulette frames: random emojis, then the already-picked one last — the animation never decides the result.
+function spinFrames(emojis, final, n, rand = Math.random) {
+  return [...Array.from({ length: n - 1 }, () => emojis[Math.floor(rand() * emojis.length)]), final];
+}
+
+const clearBlocked = (marks) => ({ ...marks, block: [] });
+
 const DEFAULT_ANSWERS = { restrictions: [], spice: "none", feel: "any", way: "dine" };
 const RESTRICTIONS = ["pork", "vegetarian", "seafood", "nuts"]; // also the notes order
 const NOTES = {
