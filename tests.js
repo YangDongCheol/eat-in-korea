@@ -538,8 +538,8 @@ function report() {
 
 // --- late-night / hangover modes ---
 // Hand-reviewed lists: changing a tag means re-reviewing the dish, so the exact set is pinned here.
-const HANGOVER_IDS = "haejang-guk hwangtae-haejangguk bugeo-guk kongnamul-gukbap sundae-gukbap dwaeji-gukbap seolleongtang gom-tang gamja-tang yukgaejang maeuntang al-tang dongtae-tang daegu-tang ojingeo-guk siraegi-guk sogogi-muguk sogogi-gukbap jogae-tang jjamppong ramyeon sundubu-jjigae".split(" ");
-const LATE_IDS = "fried-chicken yangnyeom-chicken buldak dakbal chicken-wings jokbal bossam pizza margherita-pizza hamburger tteokbokki rabokki rose-tteokbokki sundae twigim gim-mari eomuk eomuk-tang ramyeon corn-dog gopchang makchang-gui yang-kkochi dak-kkochi jjajangmyeon jjamppong tangsuyuk gun-mandu kkanpunggi kkwabaro-u mala-xiangguo malatang kebab takoyaki karaage pajeon haemul-pajeon kimchi-jeon gamja-jeon buchu-jeon".split(" ");
+const HANGOVER_IDS = "haejang-guk hwangtae-haejangguk bugeo-guk kongnamul-gukbap sundae-gukbap dwaeji-gukbap seolleongtang gom-tang gamja-tang yukgaejang maeuntang al-tang dongtae-tang daegu-tang ojingeo-guk siraegi-guk sogogi-gukbap jogae-tang jjamppong ramyeon sundubu-jjigae jjamppong-bap pho".split(" ");
+const LATE_IDS = "fried-chicken yangnyeom-chicken buldak dakbal chicken-wings jokbal bossam pizza margherita-pizza hamburger tteokbokki rabokki rose-tteokbokki sundae twigim eomuk eomuk-tang ramyeon gopchang makchang-gui yang-kkochi dak-kkochi jjajangmyeon jjamppong tangsuyuk gun-mandu kkanpunggi kkwabaro-u mala-xiangguo malatang kebab takoyaki karaage pajeon haemul-pajeon kimchi-jeon gamja-jeon buchu-jeon dubu-kimchi jjimdak hoe nakji-bokkeum gopchang-jeongol dotori-muk yakitori".split(" ");
 test("hangover pool is exactly the reviewed list", () => {
   eq(MENUS.filter(MODES.hangover.pool).map(m => m.id).sort(), [...HANGOVER_IDS].sort());
 });
