@@ -1073,4 +1073,9 @@ const MENUS = [
     name: { en: "Yogurt Bowl", zh: "酸奶碗" },
     desc: { en: "Thick yogurt in a bowl topped with fruit, granola and honey. Granola usually contains nuts, so ask.", zh: "一碗浓稠酸奶，上面放水果、燕麦脆和蜂蜜，燕麦脆通常含坚果，请先确认。", ko: "걸쭉한 요거트 위에 과일, 그래놀라, 꿀을 올린 그릇이에요. 그래놀라에는 보통 견과류가 들어가니 물어보세요." },
     spice: 0, feel: "light", contains: ["nuts"], ways: ["dine", "delivery", "home"], light: false, dessert: true },
+  // --- batch V: light vegetarian, nut-free ---
+  { id: "chaeso-gimbap", ko: "채소 김밥", emoji: "🍙", rom: "Chaeso Gimbap",
+    name: { en: "Vegetable Gimbap", zh: "蔬菜紫菜包饭" },
+    desc: { en: "Seaweed rice rolls filled with carrot, cucumber, spinach, pickled radish and egg, with no meat. Ask if any filling is added besides these.", zh: "紫菜包饭，馅料是胡萝卜、黄瓜、菠菜、腌萝卜和鸡蛋，不放肉。请确认是否另加了其他馅料。", ko: "당근, 오이, 시금치, 단무지, 계란을 넣고 고기는 뺀 김밥이에요. 다른 속 재료가 들어가는지 물어보세요." },
+    spice: 0, feel: "light", contains: [], ways: ["dine", "delivery", "home"], light: true },
 ];
